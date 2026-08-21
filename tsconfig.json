@@ -1,0 +1,34 @@
+{
+	"files": [],
+	"references": [
+		{ "path": "./api" },
+		{ "path": "./game" }
+	],
+	"compilerOptions": {
+		"rootDir": "./api",
+		"outDir": "./build",
+		"paths": {
+			"@/*": ["./api/*"]
+		},
+		"target": "esnext",
+		"types": ["node"],
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"sourceMap": true,
+		"declaration": true,
+		"declarationMap": true,
+		"noUncheckedIndexedAccess": true,
+		"exactOptionalPropertyTypes": true,
+		"strict": true,
+		"jsx": "react-jsx",
+		"verbatimModuleSyntax": true,
+		"isolatedModules": true,
+		"noUncheckedSideEffectImports": true,
+		"moduleDetection": "force",
+		"skipLibCheck": true
+	},
+	"include": ["api/**/*"],
+	"watchOptions": {
+		"excludeDirectories": ["**/node_modules", "./build", "./game", "./public"]
+	}
+}
