@@ -1,11 +1,27 @@
 import { gl } from "@/core/renderer";
-import spritesheet from "@/assets/textures/spritesheet.png";
+import building001 from "@/assets/textures/building.001.png";
+import building002 from "@/assets/textures/building.002.png";
+import building003 from "@/assets/textures/building.003.png";
+import building004 from "@/assets/textures/building.004.png";
+import building005 from "@/assets/textures/building.005.png";
+import streeti from "@/assets/textures/street.i.png";
+import streetl from "@/assets/textures/street.l.png";
+import streett from "@/assets/textures/street.t.png";
+import streetx from "@/assets/textures/street.x.png";
 
 export const textures: Record<string, WebGLTexture> = {};
 
 export async function load(): Promise<void> {
 	const infos = {
-		spritesheet
+		building001,
+		building002,
+		building003,
+		building004,
+		building005,
+		streeti,
+		streetl,
+		streett,
+		streetx
 	};
 
 	await Promise.all(Object.entries(infos).map(async ([name, src]): Promise<void> => new Promise((res) => {
