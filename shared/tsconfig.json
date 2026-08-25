@@ -1,13 +1,9 @@
 {
 	"include": ["./**/*"],
-	"references": [
-		{ "path": "../shared" }
-	],
 	"compilerOptions": {
 		"composite": true,
 		"rootDir": "./",
 		"paths": {
-			"@shared/*": ["../shared/*"],
 			"@/*": ["./*"]
 		}
 	}

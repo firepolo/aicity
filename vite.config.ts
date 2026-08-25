@@ -3,6 +3,7 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
 	root: "game",
+	assetsInclude: ["**/*.vs", "**/*.fs", "**/*.obj"],
 	resolve: {
 		alias: {
 			"@": path.resolve("game/src")

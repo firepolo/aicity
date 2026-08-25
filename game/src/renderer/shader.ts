@@ -1,39 +1,80 @@
 import { gl } from "@/core/renderer";
-import basicvert from "@/assets/shaders/basic.vert?raw";
-import basicfrag from "@/assets/shaders/basic.frag?raw";
+import { ProgressCallback } from "@/core/booter"
+import basicvert from "@/assets/shaders/basic.vs";
+import basicfrag from "@/assets/shaders/basic.fs";
 
-export const shaders: Record<string, WebGLProgram> = {};
+export class Shader {
+	private readonly id: WebGLProgram;
+	public readonly uniforms: Record<string, WebGLUniformLocation>;
 
-export function load(): void {
-	const infos: Record<string, [GLenum, string]> = {
-		basicvert: [ gl.VERTEX_SHADER, basicvert ],
-		basicfrag: [ gl.FRAGMENT_SHADER, basicfrag ]
-	};
-
-	const ids: Record<string, WebGLShader> = {};
-
-	const links: Record<string, string[]> = {
-		basic: ["basicvert", "basicfrag"]
-	};
-
-	for (const name in infos) {
-		const info = infos[name];
-		const shader = gl.createShader(info[0]);
-		if (!shader) throw new Error(`Shader ${name} is not created`);
-		gl.shaderSource(shader, info[1]);
-		gl.compileShader(shader);
-		if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(shader)!);
-		ids[name] = shader;
+	constructor(id: WebGLProgram, uniforms: Record<string, WebGLUniformLocation>) {
+		this.id = id;
+		this.uniforms = uniforms;
 	}
 
-	for (const name in links)
-	{
-		const shader = gl.createProgram();
-		for (const key of links[name]) gl.attachShader(shader, ids[key]);
-		gl.linkProgram(shader);
-		if (!gl.getProgramParameter(shader, gl.LINK_STATUS) || gl.isContextLost()) throw new Error(gl.getProgramInfoLog(shader)!);
-		shaders[name] = shader;
+	use() {
+		gl.useProgram(this.id);
 	}
+}
 
-	for (const name in ids) gl.deleteShader(ids[name]);
+export const shaders: Record<string, Shader> = {};
+
+export default {
+	async load(callback: ProgressCallback): Promise<void> {
+		const urls: Record<string, string> = {
+			basicvert,
+			basicfrag
+		};
+
+		const ids: Record<string, WebGLShader> = {};
+
+		type ShaderInfo = { shaders: string[], uniforms: string[] };
+		const infos: Record<string, ShaderInfo> = {
+			basic: {
+				shaders: [ "basicvert", "basicfrag" ],
+				uniforms: [ "uModel", "uView", "uProjection", "uSampler", "uColor" ]
+			}
+		};
+
+		const getShaderType = (ext: string): GLenum => {
+			if (ext == "vs") return gl.VERTEX_SHADER;
+			if (ext == "fs") return gl.FRAGMENT_SHADER;
+			return 0;
+		};
+
+		for (const name in urls) {
+			const url = urls[name];
+			callback(url);
+			try {
+				const source = (await (await fetch(url)).text());
+				const type: GLenum = getShaderType(url.slice(-2));
+				if (!type) throw new Error("shader type is not supported");
+				const shader = gl.createShader(type);
+				if (!shader) throw new Error(`Shader ${name} is not created`);
+				gl.shaderSource(shader, source);
+				gl.compileShader(shader);
+				if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(shader)!);
+				ids[name] = shader;
+			}
+			catch (ex) {
+				throw ex;
+			}
+		}
+
+		for (const name in infos)
+		{
+			const info = infos[name];
+			const shader = gl.createProgram();
+			for (const name of info.shaders) gl.attachShader(shader, ids[name]);
+			gl.linkProgram(shader);
+			if (!gl.getProgramParameter(shader, gl.LINK_STATUS) || gl.isContextLost()) throw new Error(gl.getProgramInfoLog(shader)!);
+
+			gl.useProgram(shader);
+			const uniforms: Record<string, WebGLUniformLocation> = {};
+			for (const name of info.uniforms) uniforms[name] = gl.getUniformLocation(shader, name)!;
+			shaders[name] = new Shader(shader, uniforms);
+		}
+
+		for (const name in ids) gl.deleteShader(ids[name]);
+	}
 }

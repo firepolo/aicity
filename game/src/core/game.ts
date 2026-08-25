@@ -1,30 +1,29 @@
-import renderer from "@/core/renderer"
-import { load as loadShaders } from "@/renderer/shader"
-import { load as loadTextures } from "@/renderer/texture"
+import renderer from "@/core/renderer";
+import { Player } from "@/entities/player";
 
-class Game {
-	async initialize(): Promise<boolean> {
-		try {
-			renderer.initialize();
-			loadShaders();
-			await loadTextures();
-			return true;
-		}
-		catch (ex: unknown) {
-			console.error(ex);
-		}
-		return false;
-	}
+const player: Player = new Player();
 
-	start(): void {
-		requestAnimationFrame(this.tick);
-	}
+let lastTime: number;
 
-	private tick = (dt: number): void => {
-		renderer.render();
+function onTick(now: number): void {
+	const elapsedTime = (now - lastTime) * 0.001;
 
-		requestAnimationFrame(this.tick);
-	}
+	player.input(elapsedTime);
+
+	renderer.render();
+	
+	lastTime = performance.now();
+	requestAnimationFrame(onTick);
 }
 
-export default new Game();
+export default {
+	initialize(): void {
+	},
+
+	start(): void {
+		player.updateCamera();
+
+		window.dispatchEvent(new Event("resize"));
+		requestAnimationFrame(onTick);
+	}
+}

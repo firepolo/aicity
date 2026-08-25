@@ -5,11 +5,7 @@
 		{ "path": "./game" }
 	],
 	"compilerOptions": {
-		"rootDir": "./api",
 		"outDir": "./build",
-		"paths": {
-			"@/*": ["./api/*"]
-		},
 		"target": "esnext",
 		"types": ["node"],
 		"esModuleInterop": true,
@@ -27,7 +23,6 @@
 		"moduleDetection": "force",
 		"skipLibCheck": true
 	},
-	"include": ["api/**/*"],
 	"watchOptions": {
 		"excludeDirectories": ["**/node_modules", "./build", "./game", "./public"]
 	}
