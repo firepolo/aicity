@@ -4,26 +4,23 @@
 		"../shared"
 	],
 	"compilerOptions": {
+		"module": "esnext",
+		"types": ["node"],
 		"rootDir": "../",
 		"outDir": "../build/api",
 		"paths": {
 			"@shared/*": ["../shared/*"],
 			"@/*": ["./src/*"]
 		},
-		"module": "nodenext",
-		"types": ["node"],
-		"esModuleInterop": true,
-		"allowSyntheticDefaultImports": true,
-		"sourceMap": true,
-		"declaration": true,
-		"declarationMap": true,
-		"noUncheckedIndexedAccess": true,
-		"exactOptionalPropertyTypes": true,
-		"strict": true,
-		"verbatimModuleSyntax": true,
-		"isolatedModules": true,
-		"noUncheckedSideEffectImports": true,
-		"moduleDetection": "force",
-		"skipLibCheck": true
+        "skipLibCheck": true,
+        "moduleResolution": "bundler",
+        "isolatedModules": true,
+        "moduleDetection": "force",
+        "strictPropertyInitialization": false,
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noFallthroughCasesInSwitch": true,
+        "noUncheckedSideEffectImports": true
 	}
 }

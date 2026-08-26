@@ -3,11 +3,13 @@ import { MessageType } from "@shared/network";
 
 const server = new WebSocketServer({
 	port: 4000
-})
+});
 
 server.on("connection", (socket: WebSocket) => {
 	console.log(`Client connected ${socket}`);
-	socket.send("Welcome client !!!");
+	const buffer: ArrayBuffer = new ArrayBuffer(1);
+	Buffer.from(buffer).writeUInt8(MessageType.LoadLevel);
+	socket.send(buffer);
 
 	socket.on("close", (code: number) => {
 		console.log(`Client disconnected with code ${code}`);
@@ -26,8 +28,7 @@ server.on("connection", (socket: WebSocket) => {
 			}
 		}
 
-		console.log(`I received message ${data}`);
-		socket.send(`I received ${data}`);
+		//socket.send(`I received ${data}`);
 	});
 });
 

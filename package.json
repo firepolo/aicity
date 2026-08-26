@@ -6,9 +6,9 @@
   "author": "",
   "type": "module",
   "scripts": {
-    "dev": "concurrently 'npx tsx --watch api/src/websocket.ts' 'vite --host'",
-    "types": "tsc --noEmit",
-    "build": "tsc && vite build"
+    "dev": "concurrently 'npx tsx --tsconfig api/tsconfig.json --watch api/src/websocket.ts' 'vite --host'",
+    "types": "tsc -p api --noEmit",
+    "build": "tsc -p api  && vite build"
   },
   "dependencies": {
     "express": "^5.2.1",

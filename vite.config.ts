@@ -5,7 +5,7 @@ export default defineConfig({
 	root: "game",
 	assetsInclude: ["**/*.vs", "**/*.fs", "**/*.obj"],
 	build: {
-		outDir: "./build/game"
+		outDir: path.resolve("build/game")
 	},
 	resolve: {
 		alias: {

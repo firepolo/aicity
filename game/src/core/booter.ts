@@ -10,14 +10,24 @@ export type ProgressCallback = (message: string) => void;
 
 export default {
 	async boot(): Promise<void> {
-		const output: HTMLHeadingElement = document.createElement("h1");
+		const output: HTMLHeadingElement = document.createElement("h3");
 		output.style.fontFamily = "Helvetia, Arial, sans-serif";
+		output.style.margin = "0";
+		output.style.textAlign = "center";
 		output.style.color = "#eee";
 		output.textContent = "TEST";
+
+		const title: HTMLHeadingElement = document.createElement("h1");
+		title.style.fontFamily = "Helvetia, Arial, sans-serif";
+		title.style.margin = "0";
+		title.style.textAlign = "center";
+		title.style.color = "#eee";
+		title.textContent = "Loading...";
 
 		const wrapper: HTMLDivElement = document.createElement("div");
 		wrapper.style.display = "flex";
 		wrapper.style.flexDirection = "column";
+		wrapper.appendChild(title);
 		wrapper.appendChild(output);
 
 		const overlay: HTMLDivElement = document.createElement("div");

@@ -18,8 +18,8 @@ function onClose(e: CloseEvent): void {
 function onError(e: Event): void {
 }
 
-function onMessage(e: MessageEvent): void {
-	const data = new DataView(e.data as ArrayBuffer, 1);
+async function onMessage(e: MessageEvent): Promise<void> {
+	const data = new DataView(await (e.data as Blob).arrayBuffer());
 	const type = data.getUint8(0);
 	if (type >= MessageType.Count) return;
 	emit(type as MessageType, data);
