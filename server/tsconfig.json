@@ -1,15 +1,13 @@
 {
 	"include": [
 		"./src",
-		"../shared"
 	],
 	"compilerOptions": {
 		"module": "esnext",
 		"types": ["node"],
 		"rootDir": "../",
-		"outDir": "../build/api",
+		"outDir": "../build/server",
 		"paths": {
-			"@shared/*": ["../shared/*"],
 			"@/*": ["./src/*"]
 		},
         "skipLibCheck": true,

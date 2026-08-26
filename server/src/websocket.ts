@@ -1,5 +1,5 @@
 import WebSocket, { WebSocketServer } from "ws";
-import { MessageType } from "@shared/network";
+import { MessageType } from "@game/shared/network";
 
 const server = new WebSocketServer({
 	port: 4000

@@ -1,0 +1,14 @@
+{
+	"name": "@game/client",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"dev": "vite --host",
+		"types": "tsc -p api --noEmit",
+		"build": "vite build"
+	},
+	"devDependencies": {
+		"vite": "^8.2.1",
+		"typescript": "^7.0.2"
+	}
+}

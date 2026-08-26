@@ -2,15 +2,13 @@ import path from "node:path";
 import { defineConfig } from "vite";
 
 export default defineConfig({
-	root: "game",
 	assetsInclude: ["**/*.vs", "**/*.fs", "**/*.obj"],
 	build: {
-		outDir: path.resolve("build/game")
+		outDir: path.resolve("../build/client")
 	},
 	resolve: {
 		alias: {
-			"@": path.resolve("game/src"),
-			"@shared": path.resolve("shared"),
+			"@": path.resolve("./src"),
 		}
 	},
 	server: {

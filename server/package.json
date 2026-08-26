@@ -1,0 +1,20 @@
+{
+	"name": "@game/server",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"dev": "npx tsx --watch src/websocket.ts",
+		"types": "tsc --noEmit",
+		"build": "tsc"
+	},
+	"dependencies": {
+		"express": "^5.2.1",
+		"ws": "^8.21.3"
+	},
+	"devDependencies": {
+		"@types/express": "^5.0.6",
+		"@types/node": "^26.2.0",
+		"@types/ws": "^8.18.1",
+		"typescript": "^7.0.2"
+	}
+}

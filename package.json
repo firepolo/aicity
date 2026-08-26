@@ -1,25 +1,20 @@
 {
-  "name": "Azure game",
-  "version": "1.0.0",
-  "description": "",
-  "license": "ISC",
-  "author": "",
-  "type": "module",
-  "scripts": {
-    "dev": "concurrently 'npx tsx --tsconfig api/tsconfig.json --watch api/src/websocket.ts' 'vite --host'",
-    "types": "tsc -p api --noEmit",
-    "build": "tsc -p api  && vite build"
-  },
-  "dependencies": {
-    "express": "^5.2.1",
-    "ws": "^8.21.3"
-  },
-  "devDependencies": {
-    "@types/express": "^5.0.6",
-    "@types/node": "^26.2.0",
-    "@types/ws": "^8.18.1",
-    "concurrently": "^10.0.5",
-    "typescript": "^7.0.2",
-    "vite": "^8.2.1"
-  }
+	"name": "Azure game",
+	"version": "1.0.0",
+	"description": "",
+	"license": "ISC",
+	"author": "firepolo",
+	"private": true,
+	"workspaces": [
+		"server",
+		"client",
+		"shared"
+	],
+	"scripts": {
+		"dev:server": "npm run dev -w=@game/server",
+		"dev:client": "npm run dev -w=@game/client",
+		"build:server": "npm run build -w=@game/server",
+		"build:client": "npm run build -w=@game/client",
+		"build": "npm run build:server && npm run build:client"
+	}
 }

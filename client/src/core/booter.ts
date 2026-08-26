@@ -15,7 +15,7 @@ export default {
 		output.style.margin = "0";
 		output.style.textAlign = "center";
 		output.style.color = "#eee";
-		output.textContent = "TEST";
+		output.textContent = "";
 
 		const title: HTMLHeadingElement = document.createElement("h1");
 		title.style.fontFamily = "Helvetia, Arial, sans-serif";

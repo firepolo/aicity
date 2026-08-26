@@ -1,4 +1,4 @@
-import { MessageType } from "@shared/network";
+import { MessageType } from "@game/shared/network";
 
 type MessageCallback = (data?: DataView) => void;
 

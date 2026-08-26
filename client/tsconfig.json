@@ -1,7 +1,6 @@
 {
 	"include": [
 		"./src",
-		"../shared"
 	],
 	"compilerOptions": {
         "target": "esnext",
@@ -14,7 +13,6 @@
             "DOM.Iterable"
         ],
 		"paths": {
-			"@shared/*": ["../shared/*"],
 			"@/*": ["./src/*"]
 		},
         "useDefineForClassFields": true,
