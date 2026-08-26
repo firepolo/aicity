@@ -1,14 +1,29 @@
 {
-	"include": ["./**/*"],
-	"references": [
-		{ "path": "../shared" }
+	"include": [
+		"./src",
+		"../shared"
 	],
 	"compilerOptions": {
-		"composite": true,
-		"rootDir": "./",
+		"rootDir": "../",
+		"outDir": "../build/api",
 		"paths": {
 			"@shared/*": ["../shared/*"],
-			"@/*": ["./*"]
-		}
+			"@/*": ["./src/*"]
+		},
+		"module": "nodenext",
+		"types": ["node"],
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"sourceMap": true,
+		"declaration": true,
+		"declarationMap": true,
+		"noUncheckedIndexedAccess": true,
+		"exactOptionalPropertyTypes": true,
+		"strict": true,
+		"verbatimModuleSyntax": true,
+		"isolatedModules": true,
+		"noUncheckedSideEffectImports": true,
+		"moduleDetection": "force",
+		"skipLibCheck": true
 	}
 }

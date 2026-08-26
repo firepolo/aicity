@@ -1,8 +1,8 @@
 import WebSocket, { WebSocketServer } from "ws";
-import { MessageType } from "@shared/messages";
+import { MessageType } from "@shared/network";
 
 const server = new WebSocketServer({
-	port: 5000
+	port: 4000
 })
 
 server.on("connection", (socket: WebSocket) => {
@@ -21,7 +21,7 @@ server.on("connection", (socket: WebSocket) => {
 		const type = buffer.readUint8(0);
 
 		switch (type) {
-			case MessageType.Level_Generate: {
+			case MessageType.LoadLevel: {
 				break;
 			}
 		}
@@ -31,4 +31,4 @@ server.on("connection", (socket: WebSocket) => {
 	});
 });
 
-console.log("Server listening on port 5000");
+console.log("Server listening on port 4000");

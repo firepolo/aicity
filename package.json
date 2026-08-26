@@ -5,9 +5,8 @@
   "license": "ISC",
   "author": "",
   "type": "module",
-  "main": "api/websocket.js",
   "scripts": {
-    "dev": "concurrently 'npx tsx --watch api/websocket.ts' 'vite --host'",
+    "dev": "concurrently 'npx tsx --watch api/src/websocket.ts' 'vite --host'",
     "types": "tsc --noEmit",
     "build": "tsc && vite build"
   },

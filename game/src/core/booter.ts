@@ -4,6 +4,7 @@ import network from "@/core/network";
 import shader from "@/renderer/shader";
 import texture from "@/renderer/texture";
 import model from "@/renderer/model";
+import level from "./level";
 
 export type ProgressCallback = (message: string) => void;
 
@@ -38,11 +39,12 @@ export default {
 		try {
 			renderer.initialize();
 			input.initialize();
-			network.initialize();
+			await network.initialize();
 
 			await shader.load(onProgress);
 			await texture.load(onProgress);
 			await model.load(onProgress);
+			await level.load(onProgress);
 		}
 		catch (ex: unknown) {
 			console.error(ex);

@@ -4,9 +4,13 @@ import { defineConfig } from "vite";
 export default defineConfig({
 	root: "game",
 	assetsInclude: ["**/*.vs", "**/*.fs", "**/*.obj"],
+	build: {
+		outDir: "./build/game"
+	},
 	resolve: {
 		alias: {
-			"@": path.resolve("game/src")
+			"@": path.resolve("game/src"),
+			"@shared": path.resolve("shared"),
 		}
 	},
 	server: {

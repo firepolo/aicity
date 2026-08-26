@@ -1,10 +1,30 @@
 {
+	"include": [
+		"./src",
+		"../shared"
+	],
 	"compilerOptions": {
-		"composite": true,
-		"rootDir": "./src",
+		"rootDir": "../",
 		"types": ["vite/client"],
-		"paths": {
-			"@/*": ["./src/*"]
-		}
+        "target": "esnext",
+        "useDefineForClassFields": true,
+        "module": "esnext",
+        "lib": [
+            "ESNext",
+            "DOM",
+            "DOM.Iterable"
+        ],
+        "skipLibCheck": true,
+        "moduleResolution": "bundler",
+        "allowImportingTsExtensions": true,
+        "isolatedModules": true,
+        "moduleDetection": "force",
+        "noEmit": true,
+        "strictPropertyInitialization": false,
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noFallthroughCasesInSwitch": true,
+        "noUncheckedSideEffectImports": true
 	}
 }
