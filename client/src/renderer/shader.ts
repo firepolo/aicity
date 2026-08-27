@@ -47,8 +47,8 @@ export default {
 			callback(url);
 			try {
 				const source = (await (await fetch(url)).text());
-				const type: GLenum = getShaderType(url.slice(-2));
-				if (!type) throw new Error("shader type is not supported");
+				const type: GLenum = getShaderType(url.split("?")[0].slice(-2));
+				if (!type) throw new Error(`shader type "${type}" is not supported`);
 				const shader = gl.createShader(type);
 				if (!shader) throw new Error(`Shader ${name} is not created`);
 				gl.shaderSource(shader, source);

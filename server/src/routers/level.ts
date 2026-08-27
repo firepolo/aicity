@@ -1,12 +1,4 @@
-import authMiddleware from "@/middlewares/auth";
-import { Router } from 'express'
+import type { Client } from "@/shared/data";
 
-const router = Router();
-
-router.get("/generate", authMiddleware, (_req, _res) => {
-});
-
-router.get("/test", authMiddleware, (_req, _res) => {
-});
-
-export default router;
+export async function generateLevel(client: Client): Promise<void> {
+}

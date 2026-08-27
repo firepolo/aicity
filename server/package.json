@@ -3,11 +3,13 @@
 	"type": "module",
 	"private": true,
 	"scripts": {
-		"dev": "npx tsx --watch src/websocket.ts",
+		"dev": "npx tsx --watch src/index.ts",
 		"types": "tsc --noEmit",
 		"build": "tsc"
 	},
 	"dependencies": {
+		"@azure/identity": "^4.13.2",
+		"@azure/service-bus": "^7.9.5",
 		"express": "^5.2.1",
 		"ws": "^8.21.3"
 	},

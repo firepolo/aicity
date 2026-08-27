@@ -13,5 +13,5 @@ uniform vec4 uColor;*/
 void main()
 {
 	//oFragColor = texture(uSampler, vTexCoord) * uColor;
-	oFragColor = vec4(vNormal, 1.0);
+	oFragColor = vec4(vNormal + 0.25, 1.0);
 }

@@ -1,18 +1,41 @@
-import levelRouter from "@/routers/level";
-import express from "express";
-import type { Request, Response } from "express";
+import WebSocket, { WebSocketServer } from "ws";
+import { MessageType } from "@game/shared/network";
+import { sockets } from "@/shared/data";
+import { randomString } from "./helpers/random";
+import type { Client } from "@/shared/data";
+import { generateLevel } from "./routers/level";
 
-const app = express();
-
-app.use(express.json())
-app.use(express.static("public"))
-
-app.use("/level", levelRouter);
-
-app.get("/health", (_req: Request, res: Response) => {
-    res.json({ status: "healthy" });
+const server = new WebSocketServer({
+	port: 4000
 });
 
-app.listen(4000, () => {
-    console.log("Server running on port 4000");
+server.on("connection", (socket: WebSocket) => {
+	const uid: string = randomString(16);
+	const client: Client = { uid, socket };
+	sockets.set(uid, socket);
+
+	const buffer: ArrayBuffer = new ArrayBuffer(1);
+	Buffer.from(buffer).writeUInt8(MessageType.LoadLevel);
+	socket.send(buffer);
+
+	socket.on("close", (code: number) => {
+		console.log(`Client disconnected with code ${code}`);
+	});
+
+	socket.on("error", console.error);
+
+	socket.on("message", (data: WebSocket.RawData) => {
+		const buffer = data as Buffer;
+
+		const type = buffer.readUint8(0);
+
+		switch (type) {
+			case MessageType.LoadLevel: {
+				generateLevel(client);
+				break;
+			}
+		}
+	});
 });
+
+console.log("Server listening on port 4000");

@@ -11,10 +11,14 @@
 		"shared"
 	],
 	"scripts": {
-		"dev:server": "npm run dev -w=@game/server",
-		"dev:client": "npm run dev -w=@game/client",
-		"build:server": "npm run build -w=@game/server",
-		"build:client": "npm run build -w=@game/client",
+		"dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+		"dev:server": "npm run dev -w @game/server",
+		"dev:client": "npm run dev -w @game/client",
+		"build:server": "npm run build -w @game/server",
+		"build:client": "npm run build -w @game/client",
 		"build": "npm run build:server && npm run build:client"
+	},
+	"devDependencies": {
+		"concurrently": "^10.0.5"
 	}
 }

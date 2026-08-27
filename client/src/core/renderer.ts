@@ -64,6 +64,6 @@ export default {
 		gl.uniformMatrix4fv(shaders["basic"].uniforms["uModel"], false, Mat4.IDENTITY);
 		gl.uniformMatrix4fv(shaders["basic"].uniforms["uView"], false, camera);
 		
-		models["building001"].render();
+		models["building003"].render();
 	}
 }
