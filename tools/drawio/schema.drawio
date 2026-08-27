@@ -1,0 +1,27 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Page-1" id="l3Lo-fNtrcDiIt0PJDTK">
+    <mxGraphModel dx="1664" dy="916" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="-94JxJj3kwLeqLESK5w8-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Game Client" vertex="1">
+          <mxGeometry height="70" width="150" x="350" y="810" as="geometry" />
+        </mxCell>
+        <mxCell id="-94JxJj3kwLeqLESK5w8-3" edge="1" parent="1" source="-94JxJj3kwLeqLESK5w8-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;startArrow=classic;startFill=1;" target="-94JxJj3kwLeqLESK5w8-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="-94JxJj3kwLeqLESK5w8-4" connectable="0" parent="-94JxJj3kwLeqLESK5w8-3" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="Websocket" vertex="1">
+          <mxGeometry relative="1" x="-0.1" y="4" as="geometry">
+            <mxPoint x="31" y="4" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-94JxJj3kwLeqLESK5w8-2" parent="1" style="whiteSpace=wrap;html=1;" value="Game Server" vertex="1">
+          <mxGeometry height="60" width="120" x="365" y="670" as="geometry" />
+        </mxCell>
+        <mxCell id="-94JxJj3kwLeqLESK5w8-5" parent="1" style="whiteSpace=wrap;html=1;" value="&lt;div&gt;Azure&lt;/div&gt;&lt;div&gt;Service Bus&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="365" y="520" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

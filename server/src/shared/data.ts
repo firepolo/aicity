@@ -1,8 +1,9 @@
 import WebSocket from "ws";
+import { UUID } from "crypto";
 
 export type Client = {
-	uid: string,
+	uuid: UUID,
 	socket: WebSocket
 };
 
-export const sockets: Map<string, WebSocket> = new Map();
+export const sockets: Map<UUID, WebSocket> = new Map();

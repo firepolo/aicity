@@ -1,7 +1,8 @@
+import "dotenv/config";
 import WebSocket, { WebSocketServer } from "ws";
 import { MessageType } from "@game/shared/network";
 import { sockets } from "@/shared/data";
-import { randomString } from "./helpers/random";
+import { randomUUID, UUID } from "crypto";
 import type { Client } from "@/shared/data";
 import { generateLevel } from "./routers/level";
 
@@ -10,9 +11,9 @@ const server = new WebSocketServer({
 });
 
 server.on("connection", (socket: WebSocket) => {
-	const uid: string = randomString(16);
-	const client: Client = { uid, socket };
-	sockets.set(uid, socket);
+	const uuid: UUID = randomUUID();
+	const client: Client = { uuid, socket };
+	sockets.set(uuid, socket);
 
 	const buffer: ArrayBuffer = new ArrayBuffer(1);
 	Buffer.from(buffer).writeUInt8(MessageType.LoadLevel);
@@ -31,7 +32,7 @@ server.on("connection", (socket: WebSocket) => {
 
 		switch (type) {
 			case MessageType.LoadLevel: {
-				generateLevel(client);
+				//generateLevel(client);
 				break;
 			}
 		}
