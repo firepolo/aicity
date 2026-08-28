@@ -1,0 +1,12 @@
+{
+	"name": "@function/level",
+	"version": "1.0.0",
+	"description": "",
+	"license": "ISC",
+	"author": "firepolo",
+	"type": "module",
+	"main": "src/index.ts",
+	"dependencies": {
+		"@azure/functions": "^4.16.2"
+	}
+}

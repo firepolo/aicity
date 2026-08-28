@@ -1,6 +1,7 @@
 {
 	"include": [
 		"./src",
+		"./experiments"
 	],
 	"compilerOptions": {
 		"module": "esnext",
@@ -12,6 +13,9 @@
 		},
         "skipLibCheck": true,
         "moduleResolution": "bundler",
+		"resolveJsonModule": true,
+		"allowJs": true,
+		"esModuleInterop": true,
         "isolatedModules": true,
         "moduleDetection": "force",
         "strictPropertyInitialization": false,

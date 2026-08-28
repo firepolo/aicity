@@ -5,11 +5,13 @@
 	"scripts": {
 		"dev": "npx tsx --watch src/index.ts",
 		"types": "tsc --noEmit",
-		"build": "tsc"
+		"build": "tsc",
+		"ex": "npx tsx tests/queue-receiver.ts"
 	},
 	"dependencies": {
 		"@azure/identity": "^4.13.2",
 		"@azure/service-bus": "^7.9.5",
+		"@faker-js/faker": "^10.6.0",
 		"express": "^5.2.1",
 		"ws": "^8.21.3"
 	},
