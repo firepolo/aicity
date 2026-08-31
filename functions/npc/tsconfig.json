@@ -5,8 +5,8 @@
 	"compilerOptions": {
 		"module": "esnext",
 		"types": ["node"],
-		"rootDir": "../",
-		"outDir": "../build/npc",
+		"rootDir": "./",
+		"outDir": "../../build/npc",
 		"paths": {
 			"@/*": ["./src/*"]
 		},
