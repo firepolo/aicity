@@ -1,10 +1,9 @@
-import { ProcessErrorArgs, ServiceBusAdministrationClient, ServiceBusClient, ServiceBusReceivedMessage, ServiceBusReceiver, ServiceBusSender } from "@azure/service-bus";
+import { ProcessErrorArgs, ServiceBusClient, ServiceBusReceivedMessage, ServiceBusReceiver, ServiceBusSender } from "@azure/service-bus";
 import { DefaultAzureCredential } from "@azure/identity";
 import { randomUUID } from "crypto";
 import { Client } from "@/shared/data";
 
 let bus: ServiceBusClient;
-let admin: ServiceBusAdministrationClient;
 let sender: ServiceBusSender;
 let receiver: ServiceBusReceiver;
 
@@ -26,7 +25,6 @@ export default {
 	initialize(): void {
 		const credential = new DefaultAzureCredential();
 		bus = new ServiceBusClient(process.env.SERVICE_BUS_ENDPOINT!, credential);
-		admin = new ServiceBusAdministrationClient(process.env.SERVICE_BUS_ENDPOINT!, credential);
 
 		sender = bus.createSender(process.env.SERVICE_BUS_TOPIC!, {
 			identifier: process.env.APP_NAME
@@ -38,7 +36,6 @@ export default {
 		receiver.subscribe({
 			processMessage: onMessage,
 			processError: onError
-		}, {
 		})
 	},
 

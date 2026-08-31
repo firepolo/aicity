@@ -8,7 +8,8 @@
 	"workspaces": [
 		"server",
 		"client",
-		"shared"
+		"shared",
+		"functions"
 	],
 	"scripts": {
 		"dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",

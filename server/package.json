@@ -5,8 +5,7 @@
 	"scripts": {
 		"dev": "npx tsx --watch src/index.ts",
 		"types": "tsc --noEmit",
-		"build": "tsc",
-		"ex": "npx tsx tests/queue-receiver.ts"
+		"build": "tsc"
 	},
 	"dependencies": {
 		"@azure/identity": "^4.13.2",

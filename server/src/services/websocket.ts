@@ -13,10 +13,6 @@ function onConnection(socket: WebSocket): void {
 	const client: Client = { uuid, socket };
 	sockets.set(uuid, socket);
 
-	const buffer: ArrayBuffer = new ArrayBuffer(1);
-	Buffer.from(buffer).writeUInt8(MessageType.LoadLevel);
-	socket.send(buffer);
-
 	socket.on("close", (code: number) => {
 		console.log(`Client disconnected with code ${code}`);
 		sockets.delete(uuid);

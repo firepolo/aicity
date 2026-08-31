@@ -1,4 +1,5 @@
 node_modules/
 build/
 tools/blender/*.blend1
+functions/local.settings.json
 *.env

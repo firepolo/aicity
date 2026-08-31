@@ -6,12 +6,6 @@ const map: { [K in MessageType]?: Set<MessageCallback> } = {};
 
 let socket!: WebSocket;
 
-function emit(type: MessageType, data?: DataView): void {
-	const set = map[type];
-	if (!set) return;
-	for (const callback of set) callback(data);
-}
-
 function onClose(e: CloseEvent): void {
 }
 
@@ -22,7 +16,10 @@ async function onMessage(e: MessageEvent): Promise<void> {
 	const data = new DataView(await (e.data as Blob).arrayBuffer());
 	const type = data.getUint8(0);
 	if (type >= MessageType.Count) return;
-	emit(type as MessageType, data);
+
+	const set = map[type as MessageType];
+	if (!set) return;
+	for (const callback of set) callback(data);
 }
 
 export default {
@@ -36,7 +33,9 @@ export default {
 		});
 	},
 
-	emit,
+	send(buffer: ArrayBuffer) {
+		socket.send(buffer);
+	},
 
 	off(type: MessageType, callback: MessageCallback): void {
 		const set = map[type];
