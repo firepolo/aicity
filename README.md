@@ -59,6 +59,16 @@ Run application
 npm run dev
 ```
 
+## Deploy Function App
+Goto in folder ```functions```
+```
+cd ./functions
+```
+Publish the functionapp
+```
+func azure functionapp publish <functionapp-name> -b remote
+```
+
 ## Warnings
 - Run Node Docker image from Windows cause "node --watch" not works
 - Azure CLI in WSL "az login" not work

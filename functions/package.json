@@ -2,7 +2,7 @@
 	"name": "@game/functions",
 	"type": "module",
 	"private": true,
-	"main": "src/generateNpc.ts",
+	"main": "dist/src/generateNpc.js",
 	"scripts": {
 		"dev": "func start",
 		"build": "tsc"
@@ -13,6 +13,7 @@
 		"@faker-js/faker": "^10.6.0"
 	},
 	"devDependencies": {
-		"@types/node": "^26.4.0"
+		"@types/node": "^26.4.0",
+		"typescript": "^7.0.2"
 	}
 }

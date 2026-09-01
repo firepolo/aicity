@@ -15,8 +15,10 @@
 		"dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
 		"dev:server": "npm run dev -w @game/server",
 		"dev:client": "npm run dev -w @game/client",
+		"dev:functions": "npm run dev -w @game/functions",
 		"build:server": "npm run build -w @game/server",
 		"build:client": "npm run build -w @game/client",
+		"build:functions": "npm run build -w @game/functions",
 		"build": "npm run build:server && npm run build:client"
 	},
 	"devDependencies": {

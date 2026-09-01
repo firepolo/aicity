@@ -6,7 +6,7 @@
 		"module": "esnext",
 		"types": ["node"],
 		"rootDir": "./",
-		"outDir": "../../build/npc",
+		"outDir": "./dist",
 		"paths": {
 			"@/*": ["./src/*"]
 		},
