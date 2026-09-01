@@ -73,6 +73,9 @@ func azure functionapp publish <functionapp-name> -b remote
 - Run Node Docker image from Windows cause "node --watch" not works
 - Azure CLI in WSL "az login" not work
 
+### Functions
+- There is a lot of things
+
 ## Architecture
 
 ## All Azure Services

@@ -3,8 +3,13 @@ import type { ServiceBusMessage } from "@azure/service-bus";
 import { faker } from "@faker-js/faker";
 import { randomUUID } from "crypto";
 
+const busOutput = output.serviceBusTopic({
+	connection: process.env.SERVICE_BUS_CONNECTION!,
+	topicName: process.env.SERVICE_BUS_TOPIC!
+});
+
 export async function generateNpc(message: ServiceBusMessage, context: InvocationContext): Promise<void> {
-    context.log('Service bus topic function process message:', message);
+    console.log('Service bus topic function process message:', message);
 	if (!message.applicationProperties || !message.applicationProperties.clientId || !message.applicationProperties.type) return;
 
 	const args = message.applicationProperties!;
@@ -34,13 +39,8 @@ export async function generateNpc(message: ServiceBusMessage, context: Invocatio
 		body: message.body
 	}));
 
-    context.log('Service bus topic function processed message:', message);
+    console.log('Service bus topic function processed message:', message);
 }
-
-const busOutput = output.serviceBusTopic({
-	connection: process.env.SERVICE_BUS_CONNECTION!,
-	topicName: process.env.SERVICE_BUS_TOPIC!
-});
 
 app.serviceBusTopic("generateNpc", {
 	connection: process.env.SERVICE_BUS_CONNECTION!,
