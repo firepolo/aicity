@@ -3,8 +3,8 @@ import WebSocket, { WebSocketServer } from "ws";
 import { MessageType } from "@game/shared/network";
 import { sockets } from "@/shared/data";
 import { randomUUID, UUID } from "crypto";
-import type { Client } from "@/shared/data";
-import events from "./events";
+import { Client } from "@/shared/data";
+import npc from "@/handlers/npc";
 
 let server!: WebSocketServer;
 
@@ -26,14 +26,9 @@ function onConnection(socket: WebSocket): void {
 		const type = buffer.readUint8(0);
 
 		switch (type) {
-			case MessageType.GenerateNpc: {
-				console.log("Send GenerateNpc to azure function");
-				events.send("npc.generate", {
-					clientId: client.uuid,
-					count: 3
-				});
+			case MessageType.GenerateNpc:
+				npc.generate(client);
 				break;
-			}
 		}
 	});
 }

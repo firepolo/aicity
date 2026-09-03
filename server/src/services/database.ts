@@ -1,6 +1,6 @@
 import { Client } from "pg";
 
-export const client = new Client({
+const client = new Client({
 	host: process.env.DB_HOST,
 	user: process.env.DB_USER,
 	password: process.env.DB_PASS,
@@ -10,6 +10,8 @@ export const client = new Client({
 });
 
 export default {
+	client,
+
 	async initialize(): Promise<void> {
 		await client.connect();
 	},

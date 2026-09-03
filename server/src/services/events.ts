@@ -3,6 +3,7 @@ import { DefaultAzureCredential } from "@azure/identity";
 import { randomUUID, UUID } from "crypto";
 import { MessageType } from "@game/shared/network";
 import { sockets } from "@/shared/data";
+import npc from "@/handlers/npc";
 
 export type EventMessage = { clientId: UUID };
 export type ResponseEventMessage = { clientId: UUID, type: MessageType };
@@ -18,14 +19,9 @@ async function onMessage(receivedMessage: ServiceBusReceivedMessage): Promise<vo
 	const socket = sockets.get(message.clientId)!;
 
 	switch (message.type) {
-		case MessageType.NpcGenerated: {
-			console.log("Received GenerateNpc from azure function");
-			const buffer = new ArrayBuffer(1);
-			const view = new DataView(buffer);
-			view.setUint8(0, MessageType.NpcGenerated);
-			socket.send(buffer);
+		case MessageType.NpcGenerated:
+			npc.generated(socket);
 			break;
-		}
 	}
 }
 
