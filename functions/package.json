@@ -9,11 +9,14 @@
 	},
 	"dependencies": {
 		"@azure/functions": "^4.16.2",
+		"@azure/identity": "^4.13.2",
 		"@azure/service-bus": "^7.9.5",
-		"@faker-js/faker": "^10.6.0"
+		"@faker-js/faker": "^10.6.0",
+		"pg": "^8.23.0"
 	},
 	"devDependencies": {
 		"@types/node": "^26.4.0",
+		"@types/pg": "^8.23.1",
 		"typescript": "^7.0.2"
 	}
 }

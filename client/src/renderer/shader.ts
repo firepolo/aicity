@@ -1,5 +1,5 @@
 import { gl } from "@/core/renderer";
-import { ProgressCallback } from "@/core/booter"
+import { ProgressCallback } from "@/core/loader"
 import basicvert from "@/assets/shaders/basic.vs";
 import basicfrag from "@/assets/shaders/basic.fs";
 

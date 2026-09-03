@@ -4,7 +4,7 @@ import { MessageType } from "@game/shared/network";
 import { sockets } from "@/shared/data";
 import { randomUUID, UUID } from "crypto";
 import type { Client } from "@/shared/data";
-import level from "@/handlers/level";
+import events from "./events";
 
 let server!: WebSocketServer;
 
@@ -26,8 +26,12 @@ function onConnection(socket: WebSocket): void {
 		const type = buffer.readUint8(0);
 
 		switch (type) {
-			case MessageType.LoadLevel: {
-				level.generate(client);
+			case MessageType.GenerateNpc: {
+				console.log("Send GenerateNpc to azure function");
+				events.send("npc.generate", {
+					clientId: client.uuid,
+					count: 3
+				});
 				break;
 			}
 		}

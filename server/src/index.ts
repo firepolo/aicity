@@ -1,11 +1,13 @@
 import "dotenv/config";
 import websocket from "./services/websocket";
 import events from "./services/events";
+import database from "./services/database";
 
 async function shutdown(code: number): Promise<void> {
 	try {
 		await websocket.shutdown();
 		await events.shutdown();
+		await database.shutdown();
 	}
 	catch (_) {}
 	process.exitCode = code;
@@ -28,6 +30,7 @@ async function main(): Promise<void> {
 		shutdown(1);
 	});
 
+	await database.initialize();
 	events.initialize();
 	await websocket.run();
 }

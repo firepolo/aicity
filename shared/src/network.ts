@@ -1,4 +1,5 @@
 export const enum MessageType {
-	LoadLevel,
+	GenerateNpc,
+	NpcGenerated,
 	Count
 };

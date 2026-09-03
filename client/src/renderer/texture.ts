@@ -1,5 +1,5 @@
 import { gl } from "@/core/renderer";
-import { ProgressCallback } from "@/core/booter"
+import { ProgressCallback } from "@/core/loader"
 import building001 from "@/assets/textures/building.001.png";
 import building002 from "@/assets/textures/building.002.png";
 import building003 from "@/assets/textures/building.003.png";

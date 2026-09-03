@@ -1,52 +1,91 @@
-import { app, InvocationContext, output } from "@azure/functions";
-import type { ServiceBusMessage } from "@azure/service-bus";
+import { app, InvocationContext } from "@azure/functions";
+import { ServiceBusClient } from "@azure/service-bus";
 import { faker } from "@faker-js/faker";
-import { randomUUID } from "crypto";
+import { randomUUID, UUID } from "crypto";
+import { Pool } from "pg";
 
-const busOutput = output.serviceBusTopic({
-	connection: process.env.SERVICE_BUS_CONNECTION!,
-	topicName: process.env.SERVICE_BUS_TOPIC!
+const enum MessageType {
+	GenerateNpc,
+	NpcGenerated,
+	Count
+};
+
+type EventMessage = {
+	clientId: UUID,
+	count: number
+};
+
+const pool = new Pool({
+	host: process.env.DB_HOST,
+	user: process.env.DB_USER,
+	password: process.env.DB_PASS,
+	database: process.env.DB_NAME,
+	pipeline: true,
+	ssl: true
 });
 
-export async function generateNpc(message: ServiceBusMessage, context: InvocationContext): Promise<void> {
-    console.log('Service bus topic function process message:', message);
-	if (!message.applicationProperties || !message.applicationProperties.clientId || !message.applicationProperties.type) return;
+const bus = new ServiceBusClient(process.env[process.env.SERVICE_BUS_CONNECTION!]!);
 
-	const args = message.applicationProperties!;
-	const count = message.body.count;
+const sender = bus.createSender(process.env.SERVICE_BUS_TOPIC!, {
+	identifier: process.env.APP_NAME
+});
 
-	for (let i = 0; i < count; ++i) {
-		console.log({
-			firstname: faker.person.firstName(),
-			lastname: faker.person.lastName(),
-			sex: faker.person.sex(),
-			age: faker.number.int({ min: 20, max: 70 }),
-			job: faker.person.jobTitle(),
-			zodiac: faker.person.zodiacSign(),
-			haircolor: faker.color.human(),
-			eyecolor: faker.color.human()
-		});
+export async function generateNpc(message: EventMessage, context: InvocationContext): Promise<void> {
+	const client = await pool.connect();
+
+    context.log("GENERATENPC process message");
+
+	try {
+		await client.query("BEGIN");
+
+		for (let i = 0; i < message.count; ++i) {
+			const npc = {
+				firstname: faker.person.firstName(),
+				lastname: faker.person.lastName(),
+				sex: faker.person.sex(),
+				age: faker.number.int({ min: 20, max: 70 }),
+				job: faker.person.jobTitle(),
+				zodiac: faker.person.zodiacSign(),
+				haircolor: faker.color.human(),
+				eyecolor: faker.color.human()
+			};
+    		context.log("GENERATENPC insert npc", npc);
+			await client.query("INSERT INTO npc(uuid, client_id, attributes, description) VALUES($1, $2, $3, $4)", [
+				crypto.randomUUID(),
+				message.clientId,
+				JSON.stringify(npc),
+				""
+			]);
+    		context.log("GENERATENPC npc inserted");
+		}
+
+		await client.query("COMMIT");
+	}
+	catch (e) {
+		client.query("ROLLBACK");
+    	context.error("GENERATENPC error:", e);
+	}
+	finally {
+		client.release();
 	}
 
-	context.extraOutputs.set(busOutput, JSON.stringify({
+	sender.sendMessages({
 		messageId: randomUUID(),
 		contentType: "application/json",
 		subject: "game.event",
-		applicationProperties: {
-			clientId: args.clientId,
-			type: "npc.generated"
-		},
-		body: message.body
-	}));
+		body: {
+			clientId: message.clientId,
+			type: MessageType.NpcGenerated
+		}
+	});
 
-    console.log('Service bus topic function processed message:', message);
+    context.log("GENERATENPC topic function processed message:", message);
 }
 
 app.serviceBusTopic("generateNpc", {
 	connection: process.env.SERVICE_BUS_CONNECTION!,
 	topicName: process.env.SERVICE_BUS_TOPIC!,
 	subscriptionName: "npc.generator",
-	extraOutputs: [busOutput],
 	handler: generateNpc,
 	cardinality: "one"
 });

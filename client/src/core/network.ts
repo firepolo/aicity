@@ -1,6 +1,6 @@
 import { MessageType } from "@game/shared/network";
 
-type MessageCallback = (data?: DataView) => void;
+export type MessageCallback = (data?: DataView) => void;
 
 const map: { [K in MessageType]?: Set<MessageCallback> } = {};
 
@@ -23,15 +23,13 @@ async function onMessage(e: MessageEvent): Promise<void> {
 }
 
 export default {
-	async initialize(): Promise<void> {
-		return new Promise<void>(res => {
-			socket = new WebSocket("ws://127.0.0.1:4000");
-			socket.addEventListener("open", () => res());
-			socket.addEventListener("close", onClose);
-			socket.addEventListener("error", onError);
-			socket.addEventListener("message", onMessage);
-		});
-	},
+	initialize: async (): Promise<void> => new Promise<void>(res => {
+		socket = new WebSocket("ws://127.0.0.1:4000");
+		socket.addEventListener("open", () => res());
+		socket.addEventListener("close", onClose);
+		socket.addEventListener("error", onError);
+		socket.addEventListener("message", onMessage);
+	}),
 
 	send(buffer: ArrayBuffer) {
 		socket.send(buffer);

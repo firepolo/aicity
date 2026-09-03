@@ -1,6 +1,6 @@
 import { Vec2 } from "@/math/vec2";
 import { Vec3 } from "@/math/vec3";
-import { ProgressCallback } from "@/core/booter"
+import { ProgressCallback } from "@/core/loader"
 
 import { gl } from "@/core/renderer"
 import building001 from "@/assets/models/building.001.obj"
