@@ -3,4 +3,5 @@ build/
 tools/blender/*.blend1
 functions/local.settings.json
 functions/dist/
+functions/build/
 *.env

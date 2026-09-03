@@ -2,10 +2,12 @@
 	"name": "@game/functions",
 	"type": "module",
 	"private": true,
-	"main": "dist/src/generateNpc.js",
+	"main": "dist/build/generateNpc.js",
 	"scripts": {
 		"dev": "func start",
-		"build": "tsc"
+		"types": "tsc --noEmit",
+		"build": "tsc",
+		"build:local": "node scripts/build.js ./src/generateNpc.ts ./build/generateNpc.ts"
 	},
 	"dependencies": {
 		"@azure/functions": "^4.16.2",

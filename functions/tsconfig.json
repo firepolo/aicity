@@ -1,15 +1,13 @@
 {
 	"include": [
-		"./src"
+		"./src",
+		"./build",
 	],
 	"compilerOptions": {
 		"module": "esnext",
 		"types": ["node"],
 		"rootDir": "./",
 		"outDir": "./dist",
-		"paths": {
-			"@/*": ["./src/*"]
-		},
         "skipLibCheck": true,
         "moduleResolution": "bundler",
 		"resolveJsonModule": true,

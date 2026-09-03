@@ -3,12 +3,7 @@ import { ServiceBusClient } from "@azure/service-bus";
 import { faker } from "@faker-js/faker";
 import { randomUUID, UUID } from "crypto";
 import { Pool } from "pg";
-
-const enum MessageType {
-	GenerateNpc,
-	NpcGenerated,
-	Count
-};
+import { MessageType } from "@game/shared/network";
 
 type EventMessage = {
 	clientId: UUID,

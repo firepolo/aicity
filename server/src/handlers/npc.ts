@@ -15,7 +15,7 @@ export default {
 	},
 
 	async generated(socket: WebSocket): Promise<void> {
-		database.client.query("SELECT ");
+		console.log(await database.client.query("SELECT uuid, attributes->>haircolor as hair, attributes->>eyecolor as eye FROM npc"));
 
 		const buffer = new ArrayBuffer(1 + 16 + NpcCount * 3 * 4);
 		const view = new DataView(buffer);

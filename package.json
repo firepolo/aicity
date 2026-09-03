@@ -18,7 +18,7 @@
 		"dev:functions": "npm run dev -w @game/functions",
 		"build:server": "npm run build -w @game/server",
 		"build:client": "npm run build -w @game/client",
-		"build:functions": "npm run build -w @game/functions",
+		"build:functions": "npm run build:local -w @game/functions",
 		"build": "npm run build:server && npm run build:client"
 	},
 	"devDependencies": {

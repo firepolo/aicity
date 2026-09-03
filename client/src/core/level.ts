@@ -2,8 +2,6 @@ import { ProgressCallback } from "@/core/loader"
 import network from "./network"
 import { MessageType } from "@game/shared/network"
 
-
-
 export default {
 	load: async (callback: ProgressCallback): Promise<void> => new Promise((res) => {
 		network.once(MessageType.NpcGenerated, (data?: DataView) => {
