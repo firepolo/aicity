@@ -1,9 +1,10 @@
 import { app, InvocationContext } from "@azure/functions";
 import { ServiceBusClient } from "@azure/service-bus";
 import { faker } from "@faker-js/faker";
-import { randomUUID, UUID } from "crypto";
+import { randomUUID, UUID } from "node:crypto";
 import { Pool } from "pg";
 import { MessageType } from "@game/shared/network";
+import { colors } from "@game/shared/colors";
 
 type EventMessage = {
 	clientId: UUID,
@@ -41,12 +42,11 @@ export async function generateNpc(message: EventMessage, context: InvocationCont
 				age: faker.number.int({ min: 20, max: 70 }),
 				job: faker.person.jobTitle(),
 				zodiac: faker.person.zodiacSign(),
-				haircolor: faker.color.human(),
-				eyecolor: faker.color.human()
+				haircolor: faker.helpers.objectKey(colors.hair),
+				eyecolor: faker.helpers.objectKey(colors.eye)
 			};
     		context.log("GENERATENPC insert npc", npc);
-			await client.query("INSERT INTO npc(uuid, client_id, attributes, description) VALUES($1, $2, $3, $4)", [
-				crypto.randomUUID(),
+			await client.query("INSERT INTO npc(client_id, attributes, description) VALUES($1, $2, $3)", [
 				message.clientId,
 				JSON.stringify(npc),
 				""

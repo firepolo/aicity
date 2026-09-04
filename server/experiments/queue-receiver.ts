@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { delay, ProcessErrorArgs, ServiceBusClient, ServiceBusReceivedMessage } from "@azure/service-bus";
 import { DefaultAzureCredential } from "@azure/identity";
-import { randomUUID, UUID } from "crypto";
+import { randomUUID, UUID } from "node:crypto";
 
 const client: { uuid: UUID } = { uuid: randomUUID() };
 

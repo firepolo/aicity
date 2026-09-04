@@ -2,7 +2,7 @@ import "dotenv/config";
 import WebSocket, { WebSocketServer } from "ws";
 import { MessageType } from "@game/shared/network";
 import { sockets } from "@/shared/data";
-import { randomUUID, UUID } from "crypto";
+import { randomUUID, UUID } from "node:crypto";
 import { Client } from "@/shared/data";
 import npc from "@/handlers/npc";
 

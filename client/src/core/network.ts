@@ -1,15 +1,15 @@
 import { MessageType } from "@game/shared/network";
 
-export type MessageCallback = (data?: DataView) => void;
+export type MessageCallback = (data: DataView) => void;
 
 const map: { [K in MessageType]?: Set<MessageCallback> } = {};
 
 let socket!: WebSocket;
 
-function onClose(e: CloseEvent): void {
+function onClose(_: CloseEvent): void {
 }
 
-function onError(e: Event): void {
+function onError(_: Event): void {
 }
 
 async function onMessage(e: MessageEvent): Promise<void> {
@@ -49,7 +49,7 @@ export default {
 	},
 
 	once(type: MessageType, callback: MessageCallback): void {
-		this.on(type, (data?: DataView) => {
+		this.on(type, (data: DataView) => {
 			this.off(type, callback);
 			callback(data);
 		});

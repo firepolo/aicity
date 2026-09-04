@@ -3,6 +3,11 @@
 	"private": true,
 	"type": "module",
 	"exports": {
-		"./network": "./src/network.ts"
+		"./network": "./src/network.ts",
+		"./colors": "./src/colors.ts",
+		"./uuid": "./src/uuid.ts"
+	},
+	"devDependencies": {
+		"@types/node": "^26.4.1"
 	}
 }

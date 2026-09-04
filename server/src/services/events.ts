@@ -1,8 +1,8 @@
 import { ProcessErrorArgs, ServiceBusClient, ServiceBusReceivedMessage, ServiceBusReceiver, ServiceBusSender } from "@azure/service-bus";
 import { DefaultAzureCredential } from "@azure/identity";
-import { randomUUID, UUID } from "crypto";
+import { randomUUID, UUID } from "node:crypto";
 import { MessageType } from "@game/shared/network";
-import { sockets } from "@/shared/data";
+import { Client, sockets } from "@/shared/data";
 import npc from "@/handlers/npc";
 
 export type EventMessage = { clientId: UUID };
@@ -16,11 +16,11 @@ async function onMessage(receivedMessage: ServiceBusReceivedMessage): Promise<vo
 	const message: ResponseEventMessage = receivedMessage.body;
 	if (!sockets.has(message.clientId)) return;
 
-	const socket = sockets.get(message.clientId)!;
+	const client: Client = { uuid: message.clientId, socket: sockets.get(message.clientId)! };
 
 	switch (message.type) {
 		case MessageType.NpcGenerated:
-			npc.generated(socket);
+			npc.generated(client);
 			break;
 	}
 }
