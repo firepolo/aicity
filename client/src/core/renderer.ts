@@ -2,6 +2,7 @@ import { shaders } from "@/renderer/shader";
 import { models } from "@/renderer/model";
 import { Mat4 } from "@/math/mat4";
 import { transform as camera } from "@/core/camera";
+import level from "./level";
 
 export let gl!: WebGL2RenderingContext;
 
@@ -48,6 +49,7 @@ export default {
 		gl = context;
 
 		gl.enable(gl.DEPTH_TEST);
+		gl.enable(gl.CULL_FACE);
 		gl.viewport(0, 0, width, height);
 		gl.activeTexture(gl.TEXTURE0);
 
@@ -61,9 +63,9 @@ export default {
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 		shaders["basic"].use();
-		gl.uniformMatrix4fv(shaders["basic"].uniforms["uModel"], false, Mat4.IDENTITY);
+		gl.uniformMatrix4fv(shaders["basic"].uniforms["uModel"], false, Mat4.identity());
 		gl.uniformMatrix4fv(shaders["basic"].uniforms["uView"], false, camera);
 		
-		models["building003"].render();
+		level.render();
 	}
 }

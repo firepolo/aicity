@@ -6,10 +6,15 @@ import database from "@/services/database";
 
 export default {
 	generate(client: Client) {
-		events.send("npc.generate", {
+		/*events.send("npc.generate", {
 			clientId: client.uuid,
 			count: 3
-		});
+		});*/
+		const buffer = new ArrayBuffer(3);
+		const view = new DataView(buffer);
+		view.setUint8(0, MessageType.NpcGenerated);
+		view.setUint16(1, 0);
+		client.socket.send(buffer);
 	},
 
 	async generated(client: Client): Promise<void> {

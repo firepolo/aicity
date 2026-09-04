@@ -8,8 +8,13 @@ import building002 from "@/assets/models/building.002.obj"
 import building003 from "@/assets/models/building.003.obj"
 import building004 from "@/assets/models/building.004.obj"
 import building005 from "@/assets/models/building.005.obj"
+import streetc from "@/assets/models/street.c.obj"
+import streeti from "@/assets/models/street.i.obj"
+import streetl from "@/assets/models/street.l.obj"
+import streett from "@/assets/models/street.t.obj"
+import streetx from "@/assets/models/street.x.obj"
 
-class Model {
+export class Model {
 	private readonly vba: WebGLVertexArrayObject;
 	private readonly count: number;
 
@@ -33,7 +38,12 @@ export default {
 			building002,
 			building003,
 			building004,
-			building005
+			building005,
+			streetc,
+			streeti,
+			streetl,
+			streett,
+			streetx
 		};
 
 		for (const name in urls) {

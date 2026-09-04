@@ -5,6 +5,7 @@ import building002 from "@/assets/textures/building.002.png";
 import building003 from "@/assets/textures/building.003.png";
 import building004 from "@/assets/textures/building.004.png";
 import building005 from "@/assets/textures/building.005.png";
+import streetc from "@/assets/textures/street.c.png";
 import streeti from "@/assets/textures/street.i.png";
 import streetl from "@/assets/textures/street.l.png";
 import streett from "@/assets/textures/street.t.png";
@@ -20,6 +21,7 @@ export default {
 			building003,
 			building004,
 			building005,
+			streetc,
 			streeti,
 			streetl,
 			streett,

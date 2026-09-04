@@ -7,11 +7,10 @@ in vec3 vNormal;
 
 out vec4 oFragColor;
 
-/*uniform sampler2D uSampler;
-uniform vec4 uColor;*/
+uniform sampler2D uSampler;
 
 void main()
 {
-	//oFragColor = texture(uSampler, vTexCoord) * uColor;
-	oFragColor = vec4(vNormal + 0.25, 1.0);
+	oFragColor = texture(uSampler, vTexCoord) * vec4(vNormal, 1.0);
+	//oFragColor = vec4(vNormal + 0.25, 1.0);
 }

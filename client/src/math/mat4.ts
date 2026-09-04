@@ -1,8 +1,6 @@
 import { Vec3 } from "./vec3";
 
 export class Mat4 extends Float32Array {
-	static IDENTITY: Mat4 = Mat4.identity();
-
 	selfLookAt(eye: Vec3, center: Vec3, up: Vec3): void {
 		const z = Vec3.normalize(Vec3.sub(eye, center));
 		const x = Vec3.normalize(Vec3.cross(up, z));
@@ -28,6 +26,17 @@ export class Mat4 extends Float32Array {
 			0, 1, 0, 0,
 			0, 0, 1, 0,
 			x, y, z, 1
+		]);
+	}
+
+	static rotateY(angle: number): Mat4 {
+		const c = Math.cos(angle);
+		const s = Math.sin(angle);
+		return new Mat4([
+			c, 0, -s, 0,
+			0, 1, 0, 0,
+			s, 0, c, 0,
+			0, 0, 0, 1
 		]);
 	}
 
