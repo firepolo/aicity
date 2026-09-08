@@ -12,16 +12,22 @@ export class Vec3 {
 		this.z = z;
 	}
 
-	set(v: Vec3) {
+	set(v: Vec3): void {
 		this.x = v.x;
 		this.y = v.y;
 		this.z = v.z;
 	}
 
-	setXYZ(x: number, y: number, z: number) {
+	setXYZ(x: number, y: number, z: number): void {
 		this.x = x;
 		this.y = y;
 		this.z = z;
+	}
+
+	clear(): void {
+		this.x = 0.0;
+		this.y = 0.0;
+		this.z = 0.0;
 	}
 
 	static add(a: Vec3, b: Vec3): Vec3 {

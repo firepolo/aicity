@@ -1,14 +1,12 @@
-import { Vec3 } from "@/math/vec3";
+import { Entity } from "./entity";
 
-export class Npc {
-	private position: Vec3 = new Vec3(0.0, 0.0, 0.0);
-	private direction: Vec3 = new Vec3(0.0, 0.0, -1.0);
-
+export class Npc extends Entity {
 	private readonly id: number;
 	private readonly hair: number;
 	private readonly eye: number;
 
 	constructor(id: number, hair: number, eye: number) {
+		super(5.0);
 		this.id = id;
 		this.hair = hair;
 		this.eye = eye;

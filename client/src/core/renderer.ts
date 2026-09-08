@@ -1,8 +1,5 @@
 import { shaders } from "@/renderer/shader";
-import { models } from "@/renderer/model";
 import { Mat4 } from "@/math/mat4";
-import { transform as camera } from "@/core/camera";
-import level from "./level";
 
 export let gl!: WebGL2RenderingContext;
 
@@ -56,16 +53,5 @@ export default {
 		canvas.addEventListener('webglcontextlost', onContextLost, false);
 		canvas.addEventListener('webglcontextrestored', onContextRestored, false);
 		window.addEventListener('resize', onContextResize, false);
-	},
-
-	render(): void {
-		gl.clearColor(0, 0, 0, 1);
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-		shaders["basic"].use();
-		gl.uniformMatrix4fv(shaders["basic"].uniforms["uModel"], false, Mat4.identity());
-		gl.uniformMatrix4fv(shaders["basic"].uniforms["uView"], false, camera);
-		
-		level.render();
 	}
 }

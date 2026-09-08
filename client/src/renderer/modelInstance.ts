@@ -16,7 +16,7 @@ export class ModelInstance {
 
 	render(): void {
 		gl.bindTexture(gl.TEXTURE_2D, this.texture);
-		gl.uniformMatrix4fv(shaders["basic"].uniforms["uModel"], false, this.transform);
+		gl.uniformMatrix4fv(shaders.basic.uniforms.uModel, false, this.transform);
 		this.model.render();
 	}
 }

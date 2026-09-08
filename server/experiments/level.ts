@@ -11,24 +11,21 @@ queue.push({ x: Math.floor(Math.random() * width) - 2 + 1, y: Math.floor(Math.ra
 while (queue.length > 0) {
 	const p = queue.pop()!;
 
-	const i = p.y * width + p.x;
-	if (grid[i].road) continue;
-	
-	grid[i].road = true;
+	for (let j = 0; j < 4; ++j) {
+		const dir = dirs[Math.floor(Math.random() * 4)];
+		const nx0 = p.x + dir.x;
+		const ny0 = p.y + dir.y;
+		const ni0 = ny0 * width + nx0;
+		if (nx0 < 1 || nx0 >= bound || ny0 < 1 || ny0 >= bound || grid[ni0].road) continue;
+		const nx1 = p.x + dir.x * 2;
+		const ny1 = p.y + dir.y * 2;
+		const ni1 = ny1 * width + nx1;
+		if (nx1 < 1 || nx1 >= bound || ny1 < 1 || ny1 >= bound || grid[ni1].road) continue;
 
-	tryloop:
-		for (let j = 0; j < 4; ++j) {
-			const dir = dirs[Math.floor(Math.random() * 4)];
-			for (let t = 1; t <= 2; ++t) {
-				const nx = p.x + dir.x * t;
-				const ny = p.y + dir.y * t;
-				const ni = ny * width + nx;
-				if (nx < 1 || nx >= bound || ny < 1 || ny >= bound || grid[ni].road) continue tryloop;
-			}
-
-			grid[(p.y + dir.y) * width + p.x + dir.x].road = true;
-			queue.push({ x: p.x + dir.x * 2, y: p.y + dir.y * 2 });
-		}
+		grid[ni0].road = true;
+		grid[ni1].road = true;
+		queue.push({ x: nx1, y: ny1 });
+	}
 }
 
 for (let y = 0; y < width; ++y) {
