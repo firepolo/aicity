@@ -21,7 +21,7 @@ export default {
 	},
 
 	set pitch(angle: number) {
-		pitch = Math.min(Math.max(-1.5, angle), 1.5);
+		pitch = Math.min(Math.max(-1.45, angle), 1.45);
 	},
 
 	update(position: Vec3, orientation: Vec3) {

@@ -201,8 +201,8 @@ export default {
 	},
 
 	render(v: Vec3) {
-		const px = Math.floor(v.x * invCellWidth);
-		const py = Math.floor(v.z * invCellWidth);
+		const px = Math.floor(v.x * invCellWidth + 0.5);
+		const py = Math.floor(v.z * invCellWidth + 0.5);
 		const l = Math.max(1, px - 4);
 		const r = Math.min(bound, px + 4);
 		const t = Math.max(1, py - 4);
