@@ -138,6 +138,8 @@ export default {
 	},
 
 	collision(entity: Entity): void {
+		if (entity.velocity.zero()) return;
+		
 		const nx = entity.position.x + entity.velocity.x + halfCellWidth;
 		const ny = entity.position.z + entity.velocity.z + halfCellWidth;
 
@@ -153,22 +155,49 @@ export default {
     	const tt = Math.floor(t * invCellWidth);
     	const tb = Math.floor(b * invCellWidth);
 
+    	let edge = false;
     	if (!grid[ty * width + tl]) {
 			entity.velocity.x += tx * cellWidth - l;
-			console.log("Collision LEFT");
+			edge = true;
 		}
     	if (!grid[ty * width + tr]) {
 			entity.velocity.x -= r - tr * cellWidth;
-			console.log("Collision RIGHT");
+			edge = true;
 		}
     	if (!grid[tt * width + tx]) {
 			entity.velocity.z += ty * cellWidth - t;
-			console.log("Collision TOP");
+			edge = true;
 		}
     	if (!grid[tb * width + tx]) {
 			entity.velocity.z -= b - tb * cellWidth;
-			console.log("Collision BOTTOM");
+			edge = true;
 		}
+		if (edge) return;
+
+    	if (!grid[tb * width + tl]) {
+			const dx = tx * cellWidth - l, dy = b - tb * cellWidth;
+        	if (Math.abs(entity.velocity.x / dx) > Math.abs(entity.velocity.z / dy)) entity.velocity.x += dx;
+        	else entity.velocity.z -= dy;
+			return;
+    	}
+    	if (!grid[tb * width + tr]) {
+			const dx = r - tr * cellWidth, dy = b - tb * cellWidth;
+        	if (Math.abs(entity.velocity.x / dx) > Math.abs(entity.velocity.z / dy)) entity.velocity.x -= dx;
+        	else entity.velocity.z -= dy;
+			return;
+    	}
+    	if (!grid[tt * width + tl]) {
+			const dx = tx * cellWidth - l, dy = ty * cellWidth - t;
+        	if (Math.abs(entity.velocity.x / dx) > Math.abs(entity.velocity.z / dy)) entity.velocity.x += dx;
+        	else entity.velocity.z += dy;
+			return;
+    	}
+    	if (!grid[tt * width + tr]) {
+			const dx = r - tr * cellWidth, dy = ty * cellWidth - t;
+        	if (Math.abs(entity.velocity.x / dx) > Math.abs(entity.velocity.z / dy)) entity.velocity.x -= dx;
+        	else entity.velocity.z += dy;
+			return;
+    	}
 	},
 
 	render(v: Vec3) {

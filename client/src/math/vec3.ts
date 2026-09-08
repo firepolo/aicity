@@ -12,6 +12,10 @@ export class Vec3 {
 		this.z = z;
 	}
 
+	zero(): boolean {
+		return this.x > -0.00001 && this.x < 0.00001 && this.y > -0.00001 && this.y < 0.00001;
+	}
+
 	set(v: Vec3): void {
 		this.x = v.x;
 		this.y = v.y;
