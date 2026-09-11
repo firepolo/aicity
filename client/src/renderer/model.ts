@@ -16,8 +16,8 @@ import streetx from "@/assets/models/street.x.obj"
 import npc from "@/assets/models/npc.obj"
 
 export class Model {
-	private readonly vba: WebGLVertexArrayObject;
-	private readonly count: number;
+	readonly vba: WebGLVertexArrayObject;
+	readonly count: number;
 
 	constructor(vba: WebGLVertexArrayObject, count: number) {
 		this.vba = vba;

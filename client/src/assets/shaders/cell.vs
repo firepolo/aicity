@@ -10,8 +10,12 @@ out vec2 vTexCoord;
 out vec3 vNormal;
 
 uniform mat4 uModel;
-uniform mat4 uView;
-uniform mat4 uProjection;
+
+uniform Camera
+{
+	mat4 uProjection;
+	mat4 uView;
+};
 
 void main()
 {

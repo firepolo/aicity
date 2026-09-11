@@ -1,11 +1,11 @@
 import { Vec3 } from "@/math/vec3";
 import { keys, mouse, mouseLocked } from "@/core/input";
 import camera from "@/core/camera";
-import { Entity } from "./entity";
+import { Collidable } from "./collidable";
 
 const MoveSpeed = 30.0;
 
-export class Player extends Entity {
+export class Player extends Collidable {
 	readonly position: Vec3 = new Vec3(0.0, 0.0, 0.0);
 	readonly direction: Vec3 = new Vec3(0.0, 0.0, -1.0);
 	private readonly headOffset: Vec3 = new Vec3(0.0, 10, 0.0);

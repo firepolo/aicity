@@ -9,6 +9,8 @@ import { Cell } from "@/core/cell";
 import { textures } from "@/renderer/texture";
 import { Entity } from "@/entities/entity";
 import { LinkedList } from "./linkedlist";
+import camera from "./camera";
+import { Collidable } from "@/entities/collidable";
 
 const CellWidth = 30;
 const HalfCellWidth = CellWidth * 0.5;
@@ -34,10 +36,8 @@ const cache = {
 	l: 0,
 	r: 0,
 	t: 0,
-	b: 0,
-	update: 0
+	b: 0
 };
-let camera: Entity;
 let npcUpdateIndex: number;
 
 function generate(): void {
@@ -68,14 +68,15 @@ function generate(): void {
 	}
 }
 
-function moveNext(): void {
+function updateNpc(): void {
 	const nexts = [ npcUpdateIndex - Width, npcUpdateIndex - 1, npcUpdateIndex + 1, npcUpdateIndex + Width ].filter(next => map[next]);
 
 	const list = npcGrid[npcUpdateIndex];
 	for (let node = list.begin; node; node = node.next) {
-		const next = nexts[Math.floor(Math.random() * nexts.length)];
-		npcGrid[next].push(node.value);
-		list.remove(node);
+		const dx = node.value.target.x - node.value.position.x;
+		const dy = node.value.target.y - node.value.position.y;
+
+		//const next = nexts[Math.floor(Math.random() * nexts.length)];
 	}
 }
 
@@ -169,8 +170,6 @@ export default {
 			npcGrid[i].push(npc);
 		}
 
-		camera = entity;
-
 		//for (npcUpdateIndex = 0; npcUpdateIndex < map.length; ++npcUpdateIndex) moveNext();
 		npcUpdateIndex = 0;
 	},
@@ -203,15 +202,15 @@ export default {
 		}*/
 	},
 
-	collision(entity: Entity): void {
-		if (entity.velocity.zero()) return;
+	collision(collidable: Collidable): void {
+		if (collidable.velocity.zero()) return;
 		
-		const nx = entity.position.x + entity.velocity.x + HalfCellWidth,
-			ny = entity.position.z + entity.velocity.z + HalfCellWidth,
-			l = nx - entity.hitbox,
-			r = nx + entity.hitbox,
-			t = ny - entity.hitbox,
-			b = ny + entity.hitbox,
+		const nx = collidable.position.x + collidable.velocity.x + HalfCellWidth,
+			ny = collidable.position.z + collidable.velocity.z + HalfCellWidth,
+			l = nx - collidable.hitbox,
+			r = nx + collidable.hitbox,
+			t = ny - collidable.hitbox,
+			b = ny + collidable.hitbox,
 			tx = Math.floor(nx * InvCellWidth),
 			ty = Math.floor(ny * InvCellWidth),
 			tl = Math.floor(l * InvCellWidth),
@@ -224,45 +223,45 @@ export default {
 
     	let edge = false;
     	if (!map[tyw + tl]) {
-			entity.velocity.x += tx * CellWidth - l;
+			collidable.velocity.x += tx * CellWidth - l;
 			edge = true;
 		}
     	if (!map[tyw + tr]) {
-			entity.velocity.x -= r - tr * CellWidth;
+			collidable.velocity.x -= r - tr * CellWidth;
 			edge = true;
 		}
     	if (!map[ttw + tx]) {
-			entity.velocity.z += ty * CellWidth - t;
+			collidable.velocity.z += ty * CellWidth - t;
 			edge = true;
 		}
     	if (!map[tbw + tx]) {
-			entity.velocity.z -= b - tb * CellWidth;
+			collidable.velocity.z -= b - tb * CellWidth;
 			edge = true;
 		}
 		if (edge) return;
 
     	if (!map[tbw + tl]) {
 			const dx = tx * CellWidth - l, dy = b - tb * CellWidth;
-        	if (Math.abs(entity.velocity.x / dx) > Math.abs(entity.velocity.z / dy)) entity.velocity.x += dx;
-        	else entity.velocity.z -= dy;
+        	if (Math.abs(collidable.velocity.x / dx) > Math.abs(collidable.velocity.z / dy)) collidable.velocity.x += dx;
+        	else collidable.velocity.z -= dy;
 			return;
     	}
     	if (!map[tbw + tr]) {
 			const dx = r - tr * CellWidth, dy = b - tb * CellWidth;
-        	if (Math.abs(entity.velocity.x / dx) > Math.abs(entity.velocity.z / dy)) entity.velocity.x -= dx;
-        	else entity.velocity.z -= dy;
+        	if (Math.abs(collidable.velocity.x / dx) > Math.abs(collidable.velocity.z / dy)) collidable.velocity.x -= dx;
+        	else collidable.velocity.z -= dy;
 			return;
     	}
     	if (!map[ttw + tl]) {
 			const dx = tx * CellWidth - l, dy = ty * CellWidth - t;
-        	if (Math.abs(entity.velocity.x / dx) > Math.abs(entity.velocity.z / dy)) entity.velocity.x += dx;
-        	else entity.velocity.z += dy;
+        	if (Math.abs(collidable.velocity.x / dx) > Math.abs(collidable.velocity.z / dy)) collidable.velocity.x += dx;
+        	else collidable.velocity.z += dy;
 			return;
     	}
     	if (!map[ttw + tr]) {
 			const dx = r - tr * CellWidth, dy = ty * CellWidth - t;
-        	if (Math.abs(entity.velocity.x / dx) > Math.abs(entity.velocity.z / dy)) entity.velocity.x -= dx;
-        	else entity.velocity.z += dy;
+        	if (Math.abs(collidable.velocity.x / dx) > Math.abs(collidable.velocity.z / dy)) collidable.velocity.x -= dx;
+        	else collidable.velocity.z += dy;
 			return;
     	}
 	},
@@ -279,11 +278,6 @@ export default {
 
 	renderNpc() {
 		models.npc.bind()
-
-		/*for (const npc of npcs) {
-			npc.render();
-			models.npc.draw();
-		}*/
 
 		for (let y = cache.t; y <= cache.b; ++y) {
 			for (let x = cache.l; x <= cache.r; ++x) {

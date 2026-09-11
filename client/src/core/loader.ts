@@ -55,6 +55,8 @@ export default {
 			await texture.load(onProgress);
 			await model.load(onProgress);
 			await level.load(onProgress);
+
+			renderer.postInitialize();
 		}
 		catch (ex: unknown) {
 			console.error(ex);

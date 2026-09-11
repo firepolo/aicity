@@ -1,7 +1,11 @@
 import { shaders } from "@/renderer/shader";
 import { Mat4 } from "@/math/mat4";
+import level from "./level";
+import camera from "./camera";
 
 export let gl!: WebGL2RenderingContext;
+
+let cameraBuffer: WebGLBuffer;
 
 function onContextLost(e: Event): void {
 	e.preventDefault();
@@ -15,10 +19,7 @@ function onContextResize(e: Event): void {
 	const w = window.innerWidth;
 	const h = window.innerHeight;
 
-	shaders.cell.use();
-	gl.uniformMatrix4fv(shaders.cell.uniforms.uProjection, false, Mat4.perspective(70, w / h, 0.01, 1000.0));
-	shaders.npc.use();
-	gl.uniformMatrix4fv(shaders.npc.uniforms.uProjection, false, Mat4.perspective(70, w / h, 0.01, 1000.0));
+	gl.bufferSubData(gl.UNIFORM_BUFFER, 0, Mat4.perspective(70, w / h, 0.01, 1000.0));
 }
 
 export default {
@@ -54,8 +55,31 @@ export default {
 		gl.viewport(0, 0, width, height);
 		gl.activeTexture(gl.TEXTURE0);
 
+		cameraBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.UNIFORM_BUFFER, cameraBuffer);
+		gl.bufferData(gl.UNIFORM_BUFFER, 16 * 4 * 2, gl.DYNAMIC_DRAW);
+
 		canvas.addEventListener('webglcontextlost', onContextLost, false);
 		canvas.addEventListener('webglcontextrestored', onContextRestored, false);
 		window.addEventListener('resize', onContextResize, false);
+	},
+
+	postInitialize(): void {
+		gl.uniformBlockBinding(shaders.cell.id, 0, 0);
+		gl.bindBufferBase(gl.UNIFORM_BUFFER, 0, cameraBuffer);
+	},
+
+	render(): void {
+		gl.clearColor(0, 0, 0, 1);
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+		gl.bufferSubData(gl.UNIFORM_BUFFER, 64, camera.transform);
+
+		shaders.cell.use();
+		level.renderCells();
+	
+		shaders.npc.use();
+		gl.uniform2f(shaders.npc.uniforms.uCamera, camera.position.x, camera.position.z);
+		level.renderNpc();
 	}
 }

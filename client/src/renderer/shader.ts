@@ -6,8 +6,8 @@ import npcvs from "@/assets/shaders/npc.vs";
 import npcfs from "@/assets/shaders/npc.fs";
 
 export class Shader {
-	private readonly id: WebGLProgram;
-	public readonly uniforms: Record<string, WebGLUniformLocation>;
+	readonly id: WebGLProgram;
+	readonly uniforms: Record<string, WebGLUniformLocation>;
 
 	constructor(id: WebGLProgram, uniforms: Record<string, WebGLUniformLocation>) {
 		this.id = id;
@@ -69,7 +69,6 @@ export default {
 			for (const name of link) gl.attachShader(shader, ids[name]);
 			gl.linkProgram(shader);
 			if (!gl.getProgramParameter(shader, gl.LINK_STATUS) || gl.isContextLost()) throw new Error(gl.getProgramInfoLog(shader)!);
-			
 
 			const uniforms: Record<string, WebGLUniformLocation> = {};
 			const count = gl.getProgramParameter(shader, gl.ACTIVE_UNIFORMS);

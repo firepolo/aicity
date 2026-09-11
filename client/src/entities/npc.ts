@@ -9,10 +9,11 @@ export class Npc extends Entity {
 	private readonly eye: number;
 	private readonly speed: number;
 	private readonly look: Vec2 = new Vec2(0.0, 1.0);
+	readonly target: Vec2 = new Vec2(0.0, 0.0);
 	readonly texture: WebGLTexture;
 
 	constructor(id: number, hair: number, eye: number, texture: WebGLTexture) {
-		super(5.0);
+		super();
 		this.id = id;
 		this.hair = hair;
 		this.eye = eye;
@@ -21,7 +22,6 @@ export class Npc extends Entity {
 	}
 
 	update(): void {
-		if (!this.velocity.zero()) this.look.setNormalize(this.velocity.x, this.velocity.z);
 	}
 
 	render(): void {

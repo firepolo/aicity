@@ -11,8 +11,12 @@ out vec2 vTexCoord;
 uniform vec3 uPosition;
 uniform vec2 uLook;
 uniform vec2 uCamera;
-uniform mat4 uView;
-uniform mat4 uProjection;
+
+uniform Camera
+{
+	mat4 uProjection;
+	mat4 uView;
+};
 
 void main()
 {
