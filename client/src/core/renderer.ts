@@ -14,7 +14,11 @@ function onContextRestored(e: Event): void {
 function onContextResize(e: Event): void {
 	const w = window.innerWidth;
 	const h = window.innerHeight;
-	gl.uniformMatrix4fv(shaders["basic"].uniforms["uProjection"], false, Mat4.perspective(70, w / h, 0.01, 1000.0));
+
+	shaders.cell.use();
+	gl.uniformMatrix4fv(shaders.cell.uniforms.uProjection, false, Mat4.perspective(70, w / h, 0.01, 1000.0));
+	shaders.npc.use();
+	gl.uniformMatrix4fv(shaders.npc.uniforms.uProjection, false, Mat4.perspective(70, w / h, 0.01, 1000.0));
 }
 
 export default {

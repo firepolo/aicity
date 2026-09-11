@@ -1,6 +1,6 @@
 import { gl } from "@/core/renderer";
 import { Player } from "@/entities/player";
-import { transform as camera } from "@/core/camera";
+import camera from "@/core/camera";
 import { shaders } from "@/renderer/shader";
 import level from "./level";
 
@@ -10,28 +10,33 @@ let lastTime: number;
 
 function onTick(now: number): void {
 	const elapsedTime = (now - lastTime) * 0.001;
+	lastTime = now;
 
 	player.input(elapsedTime);
 
 	level.collision(player);
-
 	player.update();
+
+	level.update(elapsedTime);
 
 	gl.clearColor(0, 0, 0, 1);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-	shaders.basic.use();
-	gl.uniformMatrix4fv(shaders.basic.uniforms.uView, false, camera);
-		
-	level.render(player.position);
+	shaders.cell.use();
+	gl.uniformMatrix4fv(shaders.cell.uniforms.uView, false, camera.transform);
+	level.renderCells();
 	
-	lastTime = performance.now();
+	shaders.npc.use();
+	gl.uniformMatrix4fv(shaders.npc.uniforms.uView, false, camera.transform);
+	gl.uniform2f(shaders.npc.uniforms.uCamera, camera.position.x, camera.position.z);
+	level.renderNpc();
+	
 	requestAnimationFrame(onTick);
 }
 
 export default {
 	initialize(): void {
-		level.spawn(player);
+		level.initialize(player);
 	},
 
 	start(): void {

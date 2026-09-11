@@ -10,6 +10,7 @@ import streeti from "@/assets/textures/street.i.png";
 import streetl from "@/assets/textures/street.l.png";
 import streett from "@/assets/textures/street.t.png";
 import streetx from "@/assets/textures/street.x.png";
+import npc from "@/assets/textures/npc.png";
 
 export const textures: Record<string, WebGLTexture> = {};
 
@@ -25,7 +26,8 @@ export default {
 			streeti,
 			streetl,
 			streett,
-			streetx
+			streetx,
+			npc
 		};
 
 		for (const name in urls) {

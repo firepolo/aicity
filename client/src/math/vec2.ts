@@ -11,4 +11,10 @@ export class Vec2 {
 		this.x = x;
 		this.y = y;
 	}
+
+	setNormalize(x: number, y: number): void {
+		const l = Math.sqrt(x * x + y * y);
+		this.x = x / l;
+		this.y = y / l;
+	}
 }

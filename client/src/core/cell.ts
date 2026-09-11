@@ -1,9 +1,9 @@
 import { Mat4 } from "@/math/mat4";
-import { Model } from "./model";
+import { Model } from "@/renderer/model";
 import { gl } from "@/core/renderer";
-import { shaders } from "./shader";
+import { shaders } from "@/renderer/shader";
 
-export class ModelInstance {
+export class Cell {
 	private readonly model: Model;
 	private readonly texture: WebGLTexture;
 	private readonly transform: Mat4;
@@ -16,7 +16,7 @@ export class ModelInstance {
 
 	render(): void {
 		gl.bindTexture(gl.TEXTURE_2D, this.texture);
-		gl.uniformMatrix4fv(shaders.basic.uniforms.uModel, false, this.transform);
+		gl.uniformMatrix4fv(shaders.cell.uniforms.uModel, false, this.transform);
 		this.model.render();
 	}
 }

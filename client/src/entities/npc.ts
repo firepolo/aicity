@@ -1,17 +1,32 @@
+import { gl } from "@/core/renderer";
 import { Entity } from "./entity";
+import { shaders } from "@/renderer/shader";
+import { Vec2 } from "@/math/vec2";
 
 export class Npc extends Entity {
 	private readonly id: number;
 	private readonly hair: number;
 	private readonly eye: number;
+	private readonly speed: number;
+	private readonly look: Vec2 = new Vec2(0.0, 1.0);
+	readonly texture: WebGLTexture;
 
-	constructor(id: number, hair: number, eye: number) {
+	constructor(id: number, hair: number, eye: number, texture: WebGLTexture) {
 		super(5.0);
 		this.id = id;
 		this.hair = hair;
 		this.eye = eye;
+		this.texture = texture;
+		this.speed = 5.0 + (Math.random() * 10.0);
 	}
 
-	update(elapsedTime: number) {
+	update(): void {
+		if (!this.velocity.zero()) this.look.setNormalize(this.velocity.x, this.velocity.z);
+	}
+
+	render(): void {
+		gl.bindTexture(gl.TEXTURE_2D, this.texture);
+		gl.uniform3f(shaders.npc.uniforms.uPosition, this.position.x, this.position.y, this.position.z);
+		gl.uniform2f(shaders.npc.uniforms.uLook, this.look.x, this.look.y);
 	}
 }

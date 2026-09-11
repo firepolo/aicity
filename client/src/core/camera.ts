@@ -5,9 +5,18 @@ let yaw: number = 0.0;
 let pitch: number = 0.0;
 const look: Vec3 = new Vec3(0.0, 0.0, -1.0);
 
-export const transform: Mat4 = Mat4.identity();
+const position: Vec3 = new Vec3(0.0, 0.0, 0.0);
+const transform: Mat4 = Mat4.identity();
 
 export default {
+	get position() {
+		return position;
+	},
+
+	get transform() {
+		return transform;
+	},
+
 	get yaw() {
 		return yaw;
 	},
@@ -24,8 +33,9 @@ export default {
 		pitch = Math.min(Math.max(-1.45, angle), 1.45);
 	},
 
-	update(position: Vec3, orientation: Vec3) {
+	update(pos: Vec3, orientation: Vec3) {
 		const cos = Math.cos(pitch);
+		position.set(pos);
 		look.setXYZ(orientation.x * cos, Math.sin(pitch), orientation.z * cos);
 		transform.selfLookAt(position, Vec3.add(position, look), Vec3.UP);
 	}

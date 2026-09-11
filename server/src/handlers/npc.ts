@@ -8,12 +8,19 @@ export default {
 	generate(client: Client) {
 		/*events.send("npc.generate", {
 			clientId: client.uuid,
-			count: 3
+			count: 4096
 		});*/
-		const buffer = new ArrayBuffer(3);
+		const count = 4096;
+		const buffer = new ArrayBuffer(3 + count * 6);
 		const view = new DataView(buffer);
 		view.setUint8(0, MessageType.NpcGenerated);
-		view.setUint16(1, 0);
+		view.setUint16(1, count);
+		for (let i = 0; i < count; ++i) {
+			const j = 3 + i * 6;
+			view.setUint32(j, i);
+			view.setUint8(j + 4, Math.floor(Math.random() * Object.keys(indexes.hair).length));
+			view.setUint8(j + 5, Math.floor(Math.random() * Object.keys(indexes.eye).length));
+		}
 		client.socket.send(buffer);
 	},
 

@@ -1,7 +1,9 @@
 import { gl } from "@/core/renderer";
 import { ProgressCallback } from "@/core/loader"
-import basicvert from "@/assets/shaders/basic.vs";
-import basicfrag from "@/assets/shaders/basic.fs";
+import cellvs from "@/assets/shaders/cell.vs";
+import cellfs from "@/assets/shaders/cell.fs";
+import npcvs from "@/assets/shaders/npc.vs";
+import npcfs from "@/assets/shaders/npc.fs";
 
 export class Shader {
 	private readonly id: WebGLProgram;
@@ -22,19 +24,18 @@ export const shaders: Record<string, Shader> = {};
 export default {
 	async load(callback: ProgressCallback): Promise<void> {
 		const urls: Record<string, string> = {
-			basicvert,
-			basicfrag
+			cellvs,
+			cellfs,
+			npcvs,
+			npcfs
+		};
+
+		const links: Record<string, string[]> = {
+			cell: [ "cellvs", "cellfs" ],
+			npc: [ "npcvs", "npcfs" ]
 		};
 
 		const ids: Record<string, WebGLShader> = {};
-
-		type ShaderInfo = { shaders: string[], uniforms: string[] };
-		const infos: Record<string, ShaderInfo> = {
-			basic: {
-				shaders: [ "basicvert", "basicfrag" ],
-				uniforms: [ "uModel", "uView", "uProjection", "uSampler", "uColor" ]
-			}
-		};
 
 		const getShaderType = (ext: string): GLenum => {
 			if (ext == "vs") return gl.VERTEX_SHADER;
@@ -61,17 +62,21 @@ export default {
 			}
 		}
 
-		for (const name in infos)
+		for (const name in links)
 		{
-			const info = infos[name];
+			const link = links[name];
 			const shader = gl.createProgram();
-			for (const name of info.shaders) gl.attachShader(shader, ids[name]);
+			for (const name of link) gl.attachShader(shader, ids[name]);
 			gl.linkProgram(shader);
 			if (!gl.getProgramParameter(shader, gl.LINK_STATUS) || gl.isContextLost()) throw new Error(gl.getProgramInfoLog(shader)!);
+			
 
-			gl.useProgram(shader);
 			const uniforms: Record<string, WebGLUniformLocation> = {};
-			for (const name of info.uniforms) uniforms[name] = gl.getUniformLocation(shader, name)!;
+			const count = gl.getProgramParameter(shader, gl.ACTIVE_UNIFORMS);
+			for (let i = 0; i < count; ++i) {
+				const uniform = gl.getActiveUniform(shader, i)!;
+				uniforms[uniform.name] = gl.getUniformLocation(shader, uniform.name)!;
+			}
 			shaders[name] = new Shader(shader, uniforms);
 		}
 

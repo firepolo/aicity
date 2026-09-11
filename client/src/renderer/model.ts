@@ -13,6 +13,7 @@ import streeti from "@/assets/models/street.i.obj"
 import streetl from "@/assets/models/street.l.obj"
 import streett from "@/assets/models/street.t.obj"
 import streetx from "@/assets/models/street.x.obj"
+import npc from "@/assets/models/npc.obj"
 
 export class Model {
 	private readonly vba: WebGLVertexArrayObject;
@@ -21,6 +22,14 @@ export class Model {
 	constructor(vba: WebGLVertexArrayObject, count: number) {
 		this.vba = vba;
 		this.count = count;
+	}
+
+	bind() {
+		gl.bindVertexArray(this.vba);
+	}
+
+	draw() {
+		gl.drawArrays(gl.TRIANGLES, 0, this.count);
 	}
 
 	render() {
@@ -43,7 +52,8 @@ export default {
 			streeti,
 			streetl,
 			streett,
-			streetx
+			streetx,
+			npc
 		};
 
 		for (const name in urls) {

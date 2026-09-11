@@ -5,29 +5,47 @@ import { colors } from "@game/shared/colors";
 import { Npc } from "@/entities/npc";
 import { Mat4 } from "@/math/mat4";
 import { models } from "@/renderer/model";
-import { ModelInstance } from "@/renderer/modelInstance";
+import { Cell } from "@/core/cell";
 import { textures } from "@/renderer/texture";
-import { Vec3 } from "@/math/vec3";
 import { Entity } from "@/entities/entity";
+import { LinkedList } from "./linkedlist";
 
-type Cell = ModelInstance[];
+const CellWidth = 30;
+const HalfCellWidth = CellWidth * 0.5;
+const InvCellWidth = 1 / CellWidth;
+const Width = 64;
+const Bound = Width - 1;
+const BitWidth = 6;
 
-const cellWidth = 30;
-const halfCellWidth = cellWidth * 0.5;
-const invCellWidth = 1 / cellWidth;
-const width = 64;
-const bound = width - 1;
-const bitWidth = 6;
+const StreetWidth = CellWidth * 0.25;
+const NpcMoveSpeed = 10.0;
+const NpcDecisionTime = CellWidth / NpcMoveSpeed;
+const NpcUpdateTicks = NpcDecisionTime * 30;
+const NpcUpdatePerTick = Math.floor((Width * Width) / NpcUpdateTicks);
 
-export const grid: Cell[] = new Array<Cell>(width * width);
-const npc: Npc[] = [];
+const map: number[] = new Array<number>(Width * Width);
+const cells: Cell[][] = new Array<Cell[]>(Width * Width);
+const npcs: Npc[] = [];
+const npcGrid: LinkedList<Npc>[] = Array.from({ length: Width * Width }).map(_ => new LinkedList<Npc>());
 
-function generate(): number[] {
+const cache = {
+	tx: 0,
+	ty: 0,
+	l: 0,
+	r: 0,
+	t: 0,
+	b: 0,
+	update: 0
+};
+let camera: Entity;
+let npcUpdateIndex: number;
+
+function generate(): void {
 	const dirs = [{ x: 0, y: -1 }, { x: -1, y: 0 }, { x: 1, y: 0 }, { x: 0, y: 1 }];
-	const map: number[] = new Array<number>().fill(0);
 	const queue = Array<{ x: number, y: number }>();
 
-	queue.push({ x: Math.floor(Math.random() * width) - 2 + 1, y: Math.floor(Math.random() * width) - 2 + 1 });
+	map.fill(0);
+	queue.push({ x: Math.floor(Math.random() * Width) - 2 + 1, y: Math.floor(Math.random() * Width) - 2 + 1 });
 
 	while (queue.length > 0) {
 		const p = queue.pop()!;
@@ -36,20 +54,29 @@ function generate(): number[] {
 			const dir = dirs[Math.floor(Math.random() * 4)];
 			const nx0 = p.x + dir.x;
 			const ny0 = p.y + dir.y;
-			const ni0 = ny0 * width + nx0;
-			if (nx0 < 1 || nx0 >= bound || ny0 < 1 || ny0 >= bound || map[ni0]) continue;
+			const ni0 = (ny0 << BitWidth) + nx0;
+			if (nx0 < 1 || nx0 >= Bound || ny0 < 1 || ny0 >= Bound || map[ni0]) continue;
 			const nx1 = p.x + dir.x * 2;
 			const ny1 = p.y + dir.y * 2;
-			const ni1 = ny1 * width + nx1;
-			if (nx1 < 1 || nx1 >= bound || ny1 < 1 || ny1 >= bound || map[ni1]) continue;
+			const ni1 = (ny1 << BitWidth) + nx1;
+			if (nx1 < 1 || nx1 >= Bound || ny1 < 1 || ny1 >= Bound || map[ni1]) continue;
 
 			map[ni0] = 1;
 			map[ni1] = 1;
 			queue.push({ x: nx1, y: ny1 });
 		}
 	}
+}
 
-	return map;
+function moveNext(): void {
+	const nexts = [ npcUpdateIndex - Width, npcUpdateIndex - 1, npcUpdateIndex + 1, npcUpdateIndex + Width ].filter(next => map[next]);
+
+	const list = npcGrid[npcUpdateIndex];
+	for (let node = list.begin; node; node = node.next) {
+		const next = nexts[Math.floor(Math.random() * nexts.length)];
+		npcGrid[next].push(node.value);
+		list.remove(node);
+	}
 }
 
 export default {
@@ -59,7 +86,7 @@ export default {
 			const count = view.getInt16(1);
 			for (let i = 0; i < count; ++i) {
 				const j = 3 + i * 6;
-				npc.push(new Npc(view.getUint32(j), Object.values(colors.hair)[view.getUint8(j + 4)], Object.values(colors.eye)[view.getUint8(j + 5)]));
+				npcs.push(new Npc(view.getUint32(j), Object.values(colors.hair)[view.getUint8(j + 4)], Object.values(colors.eye)[view.getUint8(j + 5)], textures.npc));
 			}
 
 			const index2Transform = [
@@ -78,141 +105,195 @@ export default {
 				"building005"
 			];
 
-			const map: number[] = generate();
-
-			for (let y = 1; y < bound; ++y) {
-				for (let x = 1; x < bound; ++x) {
-					const i = y * width + x;
+			for (let y = 1; y < Bound; ++y) {
+				for (let x = 1; x < Bound; ++x) {
+					const i = (y << BitWidth) + x;
 					if (!map[i]) continue;
 
-					const c = (map[i - width] << 3) | (map[i - 1] << 2) | (map[i + 1] << 1) | map[i + width];
+					const c = (map[i - Width] << 3) | (map[i - 1] << 2) | (map[i + 1] << 1) | map[i + Width];
 					if (c == 0b0000) continue;
 
-					const translate = Mat4.translate(x * cellWidth, 0.0, y * cellWidth);
+					const translate = Mat4.translate(x * CellWidth, 0.0, y * CellWidth);
 
-					const cell: ModelInstance[] = [];
+					const cell: Cell[] = [];
 
-					if (c == 0b0001) cell.push(new ModelInstance(models["streetc"], textures["streetc"], Mat4.mul(index2Transform[2], translate)));
-					else if (c == 0b0010) cell.push(new ModelInstance(models["streetc"], textures["streetc"], Mat4.mul(index2Transform[3], translate)));
-					else if (c == 0b0011) cell.push(new ModelInstance(models["streetl"], textures["streetl"], Mat4.mul(index2Transform[3], translate)));
-					else if (c == 0b0100) cell.push(new ModelInstance(models["streetc"], textures["streetc"], Mat4.mul(index2Transform[1], translate)));
-					else if (c == 0b0101) cell.push(new ModelInstance(models["streetl"], textures["streetl"], Mat4.mul(index2Transform[2], translate)));
-					else if (c == 0b0110) cell.push(new ModelInstance(models["streeti"], textures["streeti"], Mat4.mul(index2Transform[1], translate)));
-					else if (c == 0b0111) cell.push(new ModelInstance(models["streett"], textures["streett"], Mat4.mul(index2Transform[3], translate)));
-					else if (c == 0b1000) cell.push(new ModelInstance(models["streetc"], textures["streetc"], Mat4.mul(index2Transform[0], translate)));
-					else if (c == 0b1001) cell.push(new ModelInstance(models["streeti"], textures["streeti"], Mat4.mul(index2Transform[0], translate)));
-					else if (c == 0b1010) cell.push(new ModelInstance(models["streetl"], textures["streetl"], Mat4.mul(index2Transform[0], translate)));
-					else if (c == 0b1011) cell.push(new ModelInstance(models["streett"], textures["streett"], Mat4.mul(index2Transform[0], translate)));
-					else if (c == 0b1100) cell.push(new ModelInstance(models["streetl"], textures["streetl"], Mat4.mul(index2Transform[1], translate)));
-					else if (c == 0b1101) cell.push(new ModelInstance(models["streett"], textures["streett"], Mat4.mul(index2Transform[2], translate)));
-					else if (c == 0b1110) cell.push(new ModelInstance(models["streett"], textures["streett"], Mat4.mul(index2Transform[1], translate)));
-					else if (c == 0b1111) cell.push(new ModelInstance(models["streetx"], textures["streetx"], Mat4.mul(index2Transform[0], translate)));
+					if (c == 0b0001) cell.push(new Cell(models["streetc"], textures["streetc"], Mat4.mul(index2Transform[2], translate)));
+					else if (c == 0b0010) cell.push(new Cell(models["streetc"], textures["streetc"], Mat4.mul(index2Transform[3], translate)));
+					else if (c == 0b0011) cell.push(new Cell(models["streetl"], textures["streetl"], Mat4.mul(index2Transform[3], translate)));
+					else if (c == 0b0100) cell.push(new Cell(models["streetc"], textures["streetc"], Mat4.mul(index2Transform[1], translate)));
+					else if (c == 0b0101) cell.push(new Cell(models["streetl"], textures["streetl"], Mat4.mul(index2Transform[2], translate)));
+					else if (c == 0b0110) cell.push(new Cell(models["streeti"], textures["streeti"], Mat4.mul(index2Transform[1], translate)));
+					else if (c == 0b0111) cell.push(new Cell(models["streett"], textures["streett"], Mat4.mul(index2Transform[3], translate)));
+					else if (c == 0b1000) cell.push(new Cell(models["streetc"], textures["streetc"], Mat4.mul(index2Transform[0], translate)));
+					else if (c == 0b1001) cell.push(new Cell(models["streeti"], textures["streeti"], Mat4.mul(index2Transform[0], translate)));
+					else if (c == 0b1010) cell.push(new Cell(models["streetl"], textures["streetl"], Mat4.mul(index2Transform[0], translate)));
+					else if (c == 0b1011) cell.push(new Cell(models["streett"], textures["streett"], Mat4.mul(index2Transform[0], translate)));
+					else if (c == 0b1100) cell.push(new Cell(models["streetl"], textures["streetl"], Mat4.mul(index2Transform[1], translate)));
+					else if (c == 0b1101) cell.push(new Cell(models["streett"], textures["streett"], Mat4.mul(index2Transform[2], translate)));
+					else if (c == 0b1110) cell.push(new Cell(models["streett"], textures["streett"], Mat4.mul(index2Transform[1], translate)));
+					else if (c == 0b1111) cell.push(new Cell(models["streetx"], textures["streetx"], Mat4.mul(index2Transform[0], translate)));
 
 					for (let i = 0; i < 4; ++i) {
 						if (c & (1 << i)) continue;
 						const name = index2BuildingName[Math.floor(Math.random() * index2BuildingName.length)];
-						cell.push(new ModelInstance(models[name], textures[name], Mat4.mul(index2Transform[cardinal2Index[i]], translate)));
+						cell.push(new Cell(models[name], textures[name], Mat4.mul(index2Transform[cardinal2Index[i]], translate)));
 					}
 
-					grid[i] = cell;
+					cells[i] = cell;
 				}
 			}
 
 			res();
 		});
 
+		callback("Loading level");
+
+		generate();
+
 		const buffer = new ArrayBuffer(1);
 		const view = new DataView(buffer);
 		view.setUint8(0, MessageType.GenerateNpc);
 
-		callback("Loading level");
 		network.send(buffer);
 	}),
 
-	spawn(entity: Entity): void {
-		const streets = grid.reduce((a: number[], c: Cell, i: number) => c ? [...a, i] : a, []);
+	initialize(entity: Entity): void {
+		const streets = map.reduce((a: number[], b: number, i: number) => b > 0 ? [...a, i] : a, []);
 
-		const i = streets[Math.floor(Math.random() * streets.length)];
-		entity.position.x = (i & bound) * cellWidth;
-		entity.position.z = (i >> bitWidth) * cellWidth;
+		let i = streets[Math.floor(Math.random() * streets.length)];
+		entity.position.setXYZ((i & Bound) * CellWidth, 0.0, (i >> BitWidth) * CellWidth);
+
+		for (const npc of npcs) {
+			i = streets[Math.floor(Math.random() * streets.length)];
+			npc.position.setXYZ((i & Bound) * CellWidth + (Math.random() - Math.random()) * StreetWidth, 0.0, (i >> BitWidth) * CellWidth + (Math.random() - Math.random()) * StreetWidth);
+			npcGrid[i].push(npc);
+		}
+
+		camera = entity;
+
+		//for (npcUpdateIndex = 0; npcUpdateIndex < map.length; ++npcUpdateIndex) moveNext();
+		npcUpdateIndex = 0;
+	},
+
+	update(elapsedTime: number): void {
+		cache.tx = Math.floor(camera.position.x * InvCellWidth + 0.5);
+		cache.ty = Math.floor(camera.position.z * InvCellWidth + 0.5);
+		cache.l = Math.max(1, cache.tx - 4);
+		cache.r = Math.min(Bound, cache.tx + 4);
+		cache.t = Math.max(1, cache.ty - 4);
+		cache.b = Math.min(Bound, cache.ty + 4);
+
+		/*for (const end = npcUpdateIndex + NpcUpdatePerTick; npcUpdateIndex < map.length || npcUpdateIndex < end; ++npcUpdateIndex) {
+			if (!map[npcUpdateIndex]) continue;
+
+			const tx = npcUpdateIndex & Bound, ty = npcUpdateIndex >> BitWidth;
+			if (ty < cache.t || ty > cache.b || tx < cache.l || tx > cache.r) moveNext();
+		}
+		if (npcUpdateIndex >= map.length) npcUpdateIndex = 0;
+
+		for (let y = cache.t; y <= cache.b; ++y) {
+			for (let x = cache.l; x <= cache.r; ++x) {
+				const list = npcGrid[(y << BitWidth) + x];
+				if (!list) continue;
+
+				for (let node = list.begin; node; node = node.next) {
+					node.value.position
+				}
+			}
+		}*/
 	},
 
 	collision(entity: Entity): void {
 		if (entity.velocity.zero()) return;
 		
-		const nx = entity.position.x + entity.velocity.x + halfCellWidth;
-		const ny = entity.position.z + entity.velocity.z + halfCellWidth;
-
-    	const l = nx - entity.hitbox;
-    	const r = nx + entity.hitbox;
-    	const t = ny - entity.hitbox;
-    	const b = ny + entity.hitbox;
-
-		const tx = Math.floor(nx * invCellWidth);
-		const ty = Math.floor(ny * invCellWidth);
-    	const tl = Math.floor(l * invCellWidth);
-    	const tr = Math.floor(r * invCellWidth);
-    	const tt = Math.floor(t * invCellWidth);
-    	const tb = Math.floor(b * invCellWidth);
+		const nx = entity.position.x + entity.velocity.x + HalfCellWidth,
+			ny = entity.position.z + entity.velocity.z + HalfCellWidth,
+			l = nx - entity.hitbox,
+			r = nx + entity.hitbox,
+			t = ny - entity.hitbox,
+			b = ny + entity.hitbox,
+			tx = Math.floor(nx * InvCellWidth),
+			ty = Math.floor(ny * InvCellWidth),
+			tl = Math.floor(l * InvCellWidth),
+			tr = Math.floor(r * InvCellWidth),
+			tt = Math.floor(t * InvCellWidth),
+			tb = Math.floor(b * InvCellWidth),
+			tyw = ty << BitWidth,
+			tbw = tb << BitWidth,
+			ttw = tt << BitWidth;
 
     	let edge = false;
-    	if (!grid[ty * width + tl]) {
-			entity.velocity.x += tx * cellWidth - l;
+    	if (!map[tyw + tl]) {
+			entity.velocity.x += tx * CellWidth - l;
 			edge = true;
 		}
-    	if (!grid[ty * width + tr]) {
-			entity.velocity.x -= r - tr * cellWidth;
+    	if (!map[tyw + tr]) {
+			entity.velocity.x -= r - tr * CellWidth;
 			edge = true;
 		}
-    	if (!grid[tt * width + tx]) {
-			entity.velocity.z += ty * cellWidth - t;
+    	if (!map[ttw + tx]) {
+			entity.velocity.z += ty * CellWidth - t;
 			edge = true;
 		}
-    	if (!grid[tb * width + tx]) {
-			entity.velocity.z -= b - tb * cellWidth;
+    	if (!map[tbw + tx]) {
+			entity.velocity.z -= b - tb * CellWidth;
 			edge = true;
 		}
 		if (edge) return;
 
-    	if (!grid[tb * width + tl]) {
-			const dx = tx * cellWidth - l, dy = b - tb * cellWidth;
+    	if (!map[tbw + tl]) {
+			const dx = tx * CellWidth - l, dy = b - tb * CellWidth;
         	if (Math.abs(entity.velocity.x / dx) > Math.abs(entity.velocity.z / dy)) entity.velocity.x += dx;
         	else entity.velocity.z -= dy;
 			return;
     	}
-    	if (!grid[tb * width + tr]) {
-			const dx = r - tr * cellWidth, dy = b - tb * cellWidth;
+    	if (!map[tbw + tr]) {
+			const dx = r - tr * CellWidth, dy = b - tb * CellWidth;
         	if (Math.abs(entity.velocity.x / dx) > Math.abs(entity.velocity.z / dy)) entity.velocity.x -= dx;
         	else entity.velocity.z -= dy;
 			return;
     	}
-    	if (!grid[tt * width + tl]) {
-			const dx = tx * cellWidth - l, dy = ty * cellWidth - t;
+    	if (!map[ttw + tl]) {
+			const dx = tx * CellWidth - l, dy = ty * CellWidth - t;
         	if (Math.abs(entity.velocity.x / dx) > Math.abs(entity.velocity.z / dy)) entity.velocity.x += dx;
         	else entity.velocity.z += dy;
 			return;
     	}
-    	if (!grid[tt * width + tr]) {
-			const dx = r - tr * cellWidth, dy = ty * cellWidth - t;
+    	if (!map[ttw + tr]) {
+			const dx = r - tr * CellWidth, dy = ty * CellWidth - t;
         	if (Math.abs(entity.velocity.x / dx) > Math.abs(entity.velocity.z / dy)) entity.velocity.x -= dx;
         	else entity.velocity.z += dy;
 			return;
     	}
 	},
 
-	render(v: Vec3) {
-		const px = Math.floor(v.x * invCellWidth + 0.5);
-		const py = Math.floor(v.z * invCellWidth + 0.5);
-		const l = Math.max(1, px - 4);
-		const r = Math.min(bound, px + 4);
-		const t = Math.max(1, py - 4);
-		const b = Math.min(bound, py + 4);
-		
-		for (let y = t; y <= b; ++y) {
-			for (let x = l; x <= r; ++x) {
-				const cell = grid[y * width + x];
+	renderCells() {
+		for (let y = cache.t; y <= cache.b; ++y) {
+			for (let x = cache.l; x <= cache.r; ++x) {
+				const cell = cells[(y << BitWidth) + x];
 				if (!cell) continue;
 				for (const instance of cell) instance.render();
+			}
+		}
+	},
+
+	renderNpc() {
+		models.npc.bind()
+
+		/*for (const npc of npcs) {
+			npc.render();
+			models.npc.draw();
+		}*/
+
+		for (let y = cache.t; y <= cache.b; ++y) {
+			for (let x = cache.l; x <= cache.r; ++x) {
+				const list = npcGrid[(y << BitWidth) + x];
+				if (!list) continue;
+
+				for (let node = list.begin; node; node = node.next) {
+					node.value.render();
+					models.npc.draw();
+				}
 			}
 		}
 	}
