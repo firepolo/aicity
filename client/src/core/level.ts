@@ -16,16 +16,13 @@ const CellWidth = 30;
 const HalfCellWidth = CellWidth * 0.5;
 const InvCellWidth = 1 / CellWidth;
 const Width = 64;
-const Bound = Width - 1;
-const BitWidth = 6;
-
+const WidthLimit = Width - 1;
+const ShiftWidth = 6;
 const StreetWidth = CellWidth * 0.25;
-const NpcMoveSpeed = 10.0;
-const NpcDecisionTime = CellWidth / NpcMoveSpeed;
-const NpcUpdateTicks = NpcDecisionTime * 30;
-const NpcUpdatePerTick = Math.floor((Width * Width) / NpcUpdateTicks);
+const ChunkSize = 64;
 
 const map: number[] = new Array<number>(Width * Width);
+const nexts: number[][] = new Array<number[]>(Width * Width);
 const cells: Cell[][] = new Array<Cell[]>(Width * Width);
 const npcs: Npc[] = [];
 const npcGrid: LinkedList<Npc>[] = Array.from({ length: Width * Width }).map(_ => new LinkedList<Npc>());
@@ -36,9 +33,10 @@ const cache = {
 	l: 0,
 	r: 0,
 	t: 0,
-	b: 0
+	b: 0,
+	chunk: 0,
+	chunkstep: 0
 };
-let npcUpdateIndex: number;
 
 function generate(): void {
 	const dirs = [{ x: 0, y: -1 }, { x: -1, y: 0 }, { x: 1, y: 0 }, { x: 0, y: 1 }];
@@ -54,12 +52,12 @@ function generate(): void {
 			const dir = dirs[Math.floor(Math.random() * 4)];
 			const nx0 = p.x + dir.x;
 			const ny0 = p.y + dir.y;
-			const ni0 = (ny0 << BitWidth) + nx0;
-			if (nx0 < 1 || nx0 >= Bound || ny0 < 1 || ny0 >= Bound || map[ni0]) continue;
+			const ni0 = (ny0 << ShiftWidth) + nx0;
+			if (nx0 < 1 || nx0 >= WidthLimit || ny0 < 1 || ny0 >= WidthLimit || map[ni0]) continue;
 			const nx1 = p.x + dir.x * 2;
 			const ny1 = p.y + dir.y * 2;
-			const ni1 = (ny1 << BitWidth) + nx1;
-			if (nx1 < 1 || nx1 >= Bound || ny1 < 1 || ny1 >= Bound || map[ni1]) continue;
+			const ni1 = (ny1 << ShiftWidth) + nx1;
+			if (nx1 < 1 || nx1 >= WidthLimit || ny1 < 1 || ny1 >= WidthLimit || map[ni1]) continue;
 
 			map[ni0] = 1;
 			map[ni1] = 1;
@@ -68,15 +66,32 @@ function generate(): void {
 	}
 }
 
-function updateNpc(): void {
-	const nexts = [ npcUpdateIndex - Width, npcUpdateIndex - 1, npcUpdateIndex + 1, npcUpdateIndex + Width ].filter(next => map[next]);
+function updateNpcList(index: number, elapsedTime: number): void {
+	const list = npcGrid[index];
+	if (!list) return;
 
-	const list = npcGrid[npcUpdateIndex];
 	for (let node = list.begin; node; node = node.next) {
-		const dx = node.value.target.x - node.value.position.x;
-		const dy = node.value.target.y - node.value.position.y;
+		const npc = node.value;
+		if (npc.time >= 0.9999) {
+			const nextIndexes = nexts[index];
+			const next = nextIndexes.length > 1 || npc.prevIndex < 0 ? nextIndexes.filter(n => n != npc.prevIndex)[Math.floor(Math.random() * (nextIndexes.length - 1))] : npc.prevIndex;
+			npc.waypoint.set(npc.waypoint.x + npc.direction.x, npc.waypoint.y + npc.direction.y);
+			npc.direction.set(((next & WidthLimit) * CellWidth + (Math.random() - Math.random()) * StreetWidth) - npc.waypoint.x, ((next >> ShiftWidth) * CellWidth + (Math.random() - Math.random()) * StreetWidth) - npc.waypoint.y);
+			npc.distance = 1.0 / npc.direction.length();
+			npc.look.setNormalize(npc.direction);
+			npc.time = 0.0;
+			continue;
+		}
 
-		//const next = nexts[Math.floor(Math.random() * nexts.length)];
+		npc.time = Math.min(npc.time + npc.speed * elapsedTime * npc.distance, 1.0);
+		npc.position.setXYZ(npc.waypoint.x + npc.direction.x * npc.time, 0.0, npc.waypoint.y + npc.direction.y * npc.time);
+		const next = (Math.floor((npc.position.z + HalfCellWidth) * InvCellWidth) << ShiftWidth) + Math.floor((npc.position.x + HalfCellWidth) * InvCellWidth);
+		if (index != next) {
+			npc.prevIndex = index;
+			npcGrid[next].push(npc);
+			node = list.remove(node);
+			if (!node) return;
+		}
 	}
 }
 
@@ -106,9 +121,9 @@ export default {
 				"building005"
 			];
 
-			for (let y = 1; y < Bound; ++y) {
-				for (let x = 1; x < Bound; ++x) {
-					const i = (y << BitWidth) + x;
+			for (let y = 1; y < WidthLimit; ++y) {
+				for (let x = 1; x < WidthLimit; ++x) {
+					const i = (y << ShiftWidth) + x;
 					if (!map[i]) continue;
 
 					const c = (map[i - Width] << 3) | (map[i - 1] << 2) | (map[i + 1] << 1) | map[i + Width];
@@ -159,47 +174,42 @@ export default {
 	}),
 
 	initialize(entity: Entity): void {
-		const streets = map.reduce((a: number[], b: number, i: number) => b > 0 ? [...a, i] : a, []);
+		const streets = map.reduce((a: number[], m: number, i: number) => m > 0 ? [...a, i] : a, []);
 
-		let i = streets[Math.floor(Math.random() * streets.length)];
-		entity.position.setXYZ((i & Bound) * CellWidth, 0.0, (i >> BitWidth) * CellWidth);
+		let index = streets[Math.floor(Math.random() * 0.9999 * streets.length)];
+		entity.position.setXYZ((index & WidthLimit) * CellWidth, 0.0, (index >> ShiftWidth) * CellWidth);
+
+		for (let i = 0; i < nexts.length; ++i) nexts[i] = [ i - Width, i - 1, i + 1, i + Width ].filter(n => map[n] > 0);
 
 		for (const npc of npcs) {
-			i = streets[Math.floor(Math.random() * streets.length)];
-			npc.position.setXYZ((i & Bound) * CellWidth + (Math.random() - Math.random()) * StreetWidth, 0.0, (i >> BitWidth) * CellWidth + (Math.random() - Math.random()) * StreetWidth);
-			npcGrid[i].push(npc);
+			index = streets[Math.floor(Math.random() * (streets.length - 1))];
+			npc.waypoint.set((index & WidthLimit) * CellWidth + (Math.random() - Math.random()) * StreetWidth, (index >> ShiftWidth) * CellWidth + (Math.random() - Math.random()) * StreetWidth);
+			npc.time = 1.0;
+			npcGrid[index].push(npc);
 		}
 
-		//for (npcUpdateIndex = 0; npcUpdateIndex < map.length; ++npcUpdateIndex) moveNext();
-		npcUpdateIndex = 0;
+		for (let i = 0; i < npcGrid.length; ++i) updateNpcList(i, 0);
+
+		cache.chunkstep = npcs.length / ChunkSize;
 	},
 
 	update(elapsedTime: number): void {
 		cache.tx = Math.floor(camera.position.x * InvCellWidth + 0.5);
 		cache.ty = Math.floor(camera.position.z * InvCellWidth + 0.5);
 		cache.l = Math.max(1, cache.tx - 4);
-		cache.r = Math.min(Bound, cache.tx + 4);
+		cache.r = Math.min(WidthLimit, cache.tx + 4);
 		cache.t = Math.max(1, cache.ty - 4);
-		cache.b = Math.min(Bound, cache.ty + 4);
+		cache.b = Math.min(WidthLimit, cache.ty + 4);
 
-		/*for (const end = npcUpdateIndex + NpcUpdatePerTick; npcUpdateIndex < map.length || npcUpdateIndex < end; ++npcUpdateIndex) {
-			if (!map[npcUpdateIndex]) continue;
-
-			const tx = npcUpdateIndex & Bound, ty = npcUpdateIndex >> BitWidth;
-			if (ty < cache.t || ty > cache.b || tx < cache.l || tx > cache.r) moveNext();
+		for (let index = cache.chunk, e = index + ChunkSize; index < e; ++index) {
+			const x = index & WidthLimit, y = index >> ShiftWidth;
+			if (y >= cache.t && y <= cache.b && x >= cache.l && x <= cache.r) continue;
+			updateNpcList(index, elapsedTime * cache.chunkstep);
 		}
-		if (npcUpdateIndex >= map.length) npcUpdateIndex = 0;
+		cache.chunk = (cache.chunk + ChunkSize) % npcs.length;
 
-		for (let y = cache.t; y <= cache.b; ++y) {
-			for (let x = cache.l; x <= cache.r; ++x) {
-				const list = npcGrid[(y << BitWidth) + x];
-				if (!list) continue;
-
-				for (let node = list.begin; node; node = node.next) {
-					node.value.position
-				}
-			}
-		}*/
+		for (let y = cache.t; y <= cache.b; ++y)
+			for (let x = cache.l; x <= cache.r; ++x) updateNpcList((y << ShiftWidth) + x, elapsedTime);
 	},
 
 	collision(collidable: Collidable): void {
@@ -217,9 +227,9 @@ export default {
 			tr = Math.floor(r * InvCellWidth),
 			tt = Math.floor(t * InvCellWidth),
 			tb = Math.floor(b * InvCellWidth),
-			tyw = ty << BitWidth,
-			tbw = tb << BitWidth,
-			ttw = tt << BitWidth;
+			tyw = ty << ShiftWidth,
+			tbw = tb << ShiftWidth,
+			ttw = tt << ShiftWidth;
 
     	let edge = false;
     	if (!map[tyw + tl]) {
@@ -269,7 +279,7 @@ export default {
 	renderCells() {
 		for (let y = cache.t; y <= cache.b; ++y) {
 			for (let x = cache.l; x <= cache.r; ++x) {
-				const cell = cells[(y << BitWidth) + x];
+				const cell = cells[(y << ShiftWidth) + x];
 				if (!cell) continue;
 				for (const instance of cell) instance.render();
 			}
@@ -281,7 +291,7 @@ export default {
 
 		for (let y = cache.t; y <= cache.b; ++y) {
 			for (let x = cache.l; x <= cache.r; ++x) {
-				const list = npcGrid[(y << BitWidth) + x];
+				const list = npcGrid[(y << ShiftWidth) + x];
 				if (!list) continue;
 
 				for (let node = list.begin; node; node = node.next) {

@@ -25,6 +25,8 @@ function onTick(now: number): void {
 export default {
 	initialize(): void {
 		level.initialize(player);
+
+		lastTime = performance.now();
 	},
 
 	start(): void {

@@ -23,10 +23,11 @@ export class LinkedList<T> {
 		return this.end = this.end!.next = new Node(this.end, value);
 	}
 
-	remove(node: Node<T>) {
-		node.prev!.next = node.next;
+	remove(node: Node<T>): Node<T> | null {
+		if (node.prev) node.prev.next = node.next;
+		else this.begin = node.next;
 		if (node.next) node.next.prev = node.prev;
 		else this.end = node.prev;
-		if (!node.prev) this.begin = node.next;
+		return node.prev;
 	}
 }

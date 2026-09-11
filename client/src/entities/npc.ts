@@ -7,10 +7,14 @@ export class Npc extends Entity {
 	private readonly id: number;
 	private readonly hair: number;
 	private readonly eye: number;
-	private readonly speed: number;
-	private readonly look: Vec2 = new Vec2(0.0, 1.0);
-	readonly target: Vec2 = new Vec2(0.0, 0.0);
+	readonly speed: number;
+	readonly look: Vec2 = new Vec2(0.0, 1.0);
+	readonly waypoint: Vec2 = new Vec2(0.0, 0.0);
+	readonly direction: Vec2 = new Vec2(0.0, 0.0);
 	readonly texture: WebGLTexture;
+	prevIndex : number = -1;
+	distance: number = 0.0;
+	time: number = 0.0;
 
 	constructor(id: number, hair: number, eye: number, texture: WebGLTexture) {
 		super();
@@ -19,9 +23,6 @@ export class Npc extends Entity {
 		this.eye = eye;
 		this.texture = texture;
 		this.speed = 5.0 + (Math.random() * 10.0);
-	}
-
-	update(): void {
 	}
 
 	render(): void {
