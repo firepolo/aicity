@@ -14,6 +14,7 @@
 		"@azure/identity": "^4.13.2",
 		"@azure/service-bus": "^7.9.5",
 		"@faker-js/faker": "^10.6.0",
+		"openai": "^7.15.0",
 		"pg": "^8.23.0"
 	},
 	"devDependencies": {

@@ -25,7 +25,7 @@ export default {
 	},
 
 	async generated(client: Client): Promise<void> {
-		const rows = (await database.client.query(`SELECT id, attributes->>'haircolor' as hair, attributes->>'eyecolor' as eye FROM npc WHERE client_id=$1`, [client.uuid])).rows;
+		const rows = (await database.client.query(`SELECT id, attributes->>'haircolor' as hair, attributes->>'eyecolor' as eye FROM npcs WHERE client_id=$1`, [client.uuid])).rows;
 		const buffer = new ArrayBuffer(3 + rows.length * 6);
 		const view = new DataView(buffer);
 		view.setUint8(0, MessageType.NpcGenerated);

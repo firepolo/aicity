@@ -1,14 +1,12 @@
 import { app, InvocationContext } from "@azure/functions";
 import { ServiceBusClient } from "@azure/service-bus";
-import { faker } from "@faker-js/faker";
 import { randomUUID, UUID } from "node:crypto";
 import { Pool } from "pg";
 import { MessageType } from "@game/shared/network";
-import { colors } from "@game/shared/colors";
 
 type EventMessage = {
 	clientId: UUID,
-	count: number
+	npc: number
 };
 
 const pool = new Pool({
@@ -26,40 +24,25 @@ const sender = bus.createSender(process.env.SERVICE_BUS_TOPIC!, {
 	identifier: process.env.APP_NAME
 });
 
-export async function generateNpc(message: EventMessage, context: InvocationContext): Promise<void> {
+export async function chatNpc(message: EventMessage, context: InvocationContext): Promise<void> {
 	const client = await pool.connect();
 
-    context.log("GENERATENPC process message");
+	//await client.query("tet $1", []);
 
-	try {
+    context.log("CHATNPC process message");
+
+	/*try {
 		await client.query("BEGIN");
-
-		for (let i = 0; i < message.count; ++i) {
-			const npc = {
-				firstname: faker.person.firstName(),
-				lastname: faker.person.lastName(),
-				sex: faker.person.sex(),
-				age: faker.number.int({ min: 20, max: 70 }),
-				job: faker.person.jobTitle(),
-				zodiac: faker.person.zodiacSign(),
-				haircolor: faker.helpers.objectKey(colors.hair),
-				eyecolor: faker.helpers.objectKey(colors.eye)
-			};
-			await client.query("INSERT INTO npcs(client_id, attributes) VALUES($1, $2)", [
-				message.clientId,
-				JSON.stringify(npc)
-			]);
-		}
 
 		await client.query("COMMIT");
 	}
 	catch (e) {
 		client.query("ROLLBACK");
-    	context.error("GENERATENPC error:", e);
+    	context.error("CHATNPC error:", e);
 	}
 	finally {
 		client.release();
-	}
+	}*/
 
 	sender.sendMessages({
 		messageId: randomUUID(),
@@ -67,17 +50,17 @@ export async function generateNpc(message: EventMessage, context: InvocationCont
 		subject: "game.event",
 		body: {
 			clientId: message.clientId,
-			type: MessageType.NpcGenerated
+			type: MessageType.NpcSay
 		}
 	});
 
-    context.log("GENERATENPC topic function processed message:", message);
+    context.log("CHATNPC processed message:", message);
 }
 
-app.serviceBusTopic("generateNpc", {
+app.serviceBusTopic("chatNpc", {
 	connection: process.env.SERVICE_BUS_CONNECTION!,
 	topicName: process.env.SERVICE_BUS_TOPIC!,
-	subscriptionName: "npc.generator",
-	handler: generateNpc,
+	subscriptionName: "npc.chat",
+	handler: chatNpc,
 	cardinality: "one"
 });

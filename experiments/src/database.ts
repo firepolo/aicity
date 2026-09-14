@@ -27,7 +27,7 @@ try {
 			eyecolor: ["Bleu", "Vert", "Brun"][Math.floor(Math.random() * 3)]
 		};
 		console.log(crypto.randomUUID())
-		await client.query("INSERT INTO npc(uuid, client_id, attributes, description) VALUES($1, $2, $3, $4)", [
+		await client.query("INSERT INTO npcs(uuid, client_id, attributes, description) VALUES($1, $2, $3, $4)", [
 			crypto.randomUUID(),
 			crypto.randomUUID(),
 			JSON.stringify(npc),
@@ -41,6 +41,6 @@ catch (e) {
 	client.query("ROLLBACK");
 }
 
-console.log((await client.query("SELECT * FROM npc")).rows);
+console.log((await client.query("SELECT * FROM npcs")).rows);
 
 await client.release()
