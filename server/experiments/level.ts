@@ -1,8 +1,6 @@
-type Cell = { road: boolean, north: number, west: number, east: number, south: number };
-
 const width = 32;
 const bound = width - 1;
-const grid = Array.from({ length: width * width }).map<Cell>(_ => ({ road: false, north: 0, west: 0, east: 0, south: 0 }));
+const map = new Array(width * width);
 const dirs = [{ x: 0, y: -1 }, { x: -1, y: 0 }, { x: 1, y: 0 }, { x: 0, y: 1 }];
 const queue = Array<{ x: number, y: number }>();
 
@@ -13,25 +11,28 @@ while (queue.length > 0) {
 
 	for (let j = 0; j < 4; ++j) {
 		const dir = dirs[Math.floor(Math.random() * 4)];
+		const check = Math.random() < 0.8;
 		const nx0 = p.x + dir.x;
 		const ny0 = p.y + dir.y;
-		const ni0 = ny0 * width + nx0;
-		if (nx0 < 1 || nx0 >= bound || ny0 < 1 || ny0 >= bound || grid[ni0].road) continue;
+		if (nx0 < 1 || nx0 >= bound || ny0 < 1 || ny0 >= bound) continue;
 		const nx1 = p.x + dir.x * 2;
 		const ny1 = p.y + dir.y * 2;
-		const ni1 = ny1 * width + nx1;
-		if (nx1 < 1 || nx1 >= bound || ny1 < 1 || ny1 >= bound || grid[ni1].road) continue;
+		if (nx1 < 1 || nx1 >= bound || ny1 < 1 || ny1 >= bound) continue;
 
-		grid[ni0].road = true;
-		grid[ni1].road = true;
-		queue.push({ x: nx1, y: ny1 });
+		const ni0 = ny0 * width + nx0;
+		const ni1 = ny1 * width + nx1;
+		if (check && (map[ni0] || map[ni1])) continue;
+
+		map[ni0] = 1;
+		if (!map[ni1]) {
+			map[ni1] = 1;
+			queue.push({ x: nx1, y: ny1 });
+		}
 	}
 }
 
 for (let y = 0; y < width; ++y) {
 	let line = "";
-	for (let x = 0; x < width; ++x) {
-		line += grid[y * width + x].road ? " " : "#";
-	}
+	for (let x = 0; x < width; ++x) line += map[y * width + x] ? " " : "#";
 	console.log(line);
 }

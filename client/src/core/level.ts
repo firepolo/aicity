@@ -50,18 +50,23 @@ function generate(): void {
 
 		for (let j = 0; j < 4; ++j) {
 			const dir = dirs[Math.floor(Math.random() * 4)];
+			const check = Math.random() < 0.8;
 			const nx0 = p.x + dir.x;
 			const ny0 = p.y + dir.y;
-			const ni0 = (ny0 << ShiftWidth) + nx0;
-			if (nx0 < 1 || nx0 >= WidthLimit || ny0 < 1 || ny0 >= WidthLimit || map[ni0]) continue;
+			if (nx0 < 1 || nx0 >= WidthLimit || ny0 < 1 || ny0 >= WidthLimit) continue;
 			const nx1 = p.x + dir.x * 2;
 			const ny1 = p.y + dir.y * 2;
+			if (nx1 < 1 || nx1 >= WidthLimit || ny1 < 1 || ny1 >= WidthLimit) continue;
+
+			const ni0 = (ny0 << ShiftWidth) + nx0;
 			const ni1 = (ny1 << ShiftWidth) + nx1;
-			if (nx1 < 1 || nx1 >= WidthLimit || ny1 < 1 || ny1 >= WidthLimit || map[ni1]) continue;
+			if (check && (map[ni0] || map[ni1])) continue;
 
 			map[ni0] = 1;
-			map[ni1] = 1;
-			queue.push({ x: nx1, y: ny1 });
+			if (!map[ni1]) {
+				map[ni1] = 1;
+				queue.push({ x: nx1, y: ny1 });
+			}
 		}
 	}
 }
