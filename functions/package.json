@@ -7,7 +7,7 @@
 		"dev": "func start",
 		"types": "tsc --noEmit",
 		"build": "tsc",
-		"build:local": "node scripts/build.js ./src/generateNpc.ts ./build/generateNpc.ts"
+		"build:local": "node scripts/build.js ./src ./build"
 	},
 	"dependencies": {
 		"@azure/functions": "^4.16.2",
