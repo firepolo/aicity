@@ -12,12 +12,11 @@ CREATE TABLE IF NOT EXISTS public.npcs
     CONSTRAINT npc_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE IF NOT EXISTS public.conversations
+CREATE TABLE IF NOT EXISTS public.informations
 (
-    npc_id bigint NOT NULL,
+    npc_id bigint,
     text text COLLATE pg_catalog."default",
     embedding vector,
-    "timestamp" timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_npc_conversation_ FOREIGN KEY (npc_id)
         REFERENCES public.npcs (id) MATCH SIMPLE
         ON UPDATE NO ACTION

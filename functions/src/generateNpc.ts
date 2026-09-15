@@ -43,7 +43,17 @@ export async function generateNpc(message: EventMessage, context: InvocationCont
 				job: faker.person.jobTitle(),
 				zodiac: faker.person.zodiacSign(),
 				haircolor: faker.helpers.objectKey(colors.hair),
-				eyecolor: faker.helpers.objectKey(colors.eye)
+				eyecolor: faker.helpers.objectKey(colors.eye),
+				personality: {
+					openness: faker.number.int({ min: 0, max: 100 }),
+  					conscientiousness: faker.number.int({ min: 0, max: 100 }),
+  					extraversion: faker.number.int({ min: 0, max: 100 }),
+  					agreeableness: faker.number.int({ min: 0, max: 100 }),
+  					neuroticism: faker.number.int({ min: 0, max: 100 }),
+  					honesty: faker.number.int({ min: 0, max: 100 }),
+  					empathy: faker.number.int({ min: 0, max: 100 }),
+  					impulsivity: faker.number.int({ min: 0, max: 100 })
+				}
 			};
 			await client.query("INSERT INTO npcs(client_id, attributes) VALUES($1, $2)", [
 				message.clientId,

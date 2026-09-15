@@ -61,12 +61,18 @@ npm run dev
 
 ## Deploy Function App
 Goto in folder ```functions```
-```
+```shell
 cd ./functions
 ```
 Publish the functionapp
-```
+```shell
 func azure functionapp publish <functionapp-name> -b remote
+```
+
+## Local postgres
+Use pgvector image (postgres with vector extension)
+```shell
+docker run --rm --name aicity-db -e POSTGRES_PASSWORD=1234 -v .:/var/lib/postgresql -p5432:5432 -d pgvector
 ```
 
 ## Warnings
@@ -75,6 +81,19 @@ func azure functionapp publish <functionapp-name> -b remote
 
 ### Functions
 - There is a lot of things
+
+## Exemple city prompt
+```
+Décris-moi un ville fictive avec un nom fictif. Voici les informations nécessaires.
+
+- Elle se trouve sur Terre
+- Elle à notre époque 2026
+- Il y a beaucoup de quartier très différents.
+- Elle est réaliste et crédible
+- Il y a un secret
+
+Ta réponse doit être au format texte brute.
+```
 
 ## Architecture
 

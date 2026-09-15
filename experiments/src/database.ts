@@ -1,13 +1,13 @@
 import "dotenv/config";
 import { Pool } from "pg";
 
-export const pool = new Pool({
+const pool = new Pool({
 	host: process.env.DB_HOST,
 	user: process.env.DB_USER,
 	password: process.env.DB_PASS,
 	database: process.env.DB_NAME,
 	pipeline: true,
-	ssl: true
+	ssl: !!process.env.DB_SSL
 });
 
 const client = await pool.connect();
@@ -26,12 +26,9 @@ try {
 			haircolor: ["Chatain", "Blond", "Noir"][Math.floor(Math.random() * 3)],
 			eyecolor: ["Bleu", "Vert", "Brun"][Math.floor(Math.random() * 3)]
 		};
-		console.log(crypto.randomUUID())
-		await client.query("INSERT INTO npcs(uuid, client_id, attributes, description) VALUES($1, $2, $3, $4)", [
+		await client.query("INSERT INTO npcs(client_id, attributes) VALUES($1, $2)", [
 			crypto.randomUUID(),
-			crypto.randomUUID(),
-			JSON.stringify(npc),
-			""
+			JSON.stringify(npc)
 		]);
 	}
 
