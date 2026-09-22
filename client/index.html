@@ -6,7 +6,84 @@
 		<link rel="icon" href="/favicon.ico">
         <script type="module" src="/src/main.ts"></script>
 		<title>AICity</title>
+		<style>
+			@font-face {
+				font-family: FixedSys;
+				src: url(/fonts/FSEX300.ttf);
+			}
+
+			html {
+				font-family: FixedSys, Helvetia, Arial, sans-serif;
+				font-size: 24px;
+			}
+
+			#renderer {
+				position: fixed;
+				inset: 0;
+				width: 100vw;
+				height: 100vh;
+				z-index: 0;
+				image-rendering: pixelated;
+			}
+
+			#overlay {
+				position: fixed;
+				inset: 0;
+				z-index: 777;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				background-color: #111;
+			}
+
+			#overlay-wrapper {
+				display: flex;
+				flex-direction: column;
+			}
+
+			#chatbox {
+				position: fixed;
+				bottom: 2rem;
+				left: 2rem;
+				right: 2rem;
+				z-index: 555;
+			}
+
+			#chatbox-input {
+				width: 100%;
+				min-width: 100%;
+				max-width: 100%;
+				padding: .5rem;
+				border: .5rem solid #333;
+				box-sizing: border-box;
+				outline: none;
+				background-color: #eee;
+				color: #333;
+				font-family: inherit;
+				font-size: inherit;
+			}
+
+			h1, h3 {
+				margin: 0;
+				text-align: center;
+				color: #eee;
+			}
+
+			.hidden {
+				display: none !important;
+			}
+		</style>
     </head>
     <body>
+		<canvas id="renderer" width="320" height="180"></canvas>
+		<div id="chatbox">
+			<textarea id="chatbox-input" rows="4"></textarea>
+		</div>
+		<div id="overlay">
+			<div id="overlay-wrapper">
+				<h1 id="overlay-title"></h1>
+				<h3 id="overlay-subtitle"></h3>
+			</div>
+		</div>
     </body>
 </html>

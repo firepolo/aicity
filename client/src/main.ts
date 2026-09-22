@@ -1,6 +1,6 @@
-import loader from "./core/loader"
+import booter from "./core/booter"
 import game from "./core/game"
 
-await loader.boot();
+await booter.boot();
 game.initialize()
 game.start();

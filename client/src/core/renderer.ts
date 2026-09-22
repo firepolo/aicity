@@ -2,6 +2,7 @@ import { shaders } from "@/renderer/shader";
 import { Mat4 } from "@/math/mat4";
 import level from "./level";
 import camera from "./camera";
+import overlay from "../ui/overlay";
 
 export let gl!: WebGL2RenderingContext;
 
@@ -24,20 +25,9 @@ function onContextResize(e: Event): void {
 
 export default {
 	initialize(): void {
-		const width = 320;
-		const height = 180;
+		overlay.setSubTitle("Renderer");
 
-		const canvas = document.createElement("canvas");
-		canvas.width = width;
-		canvas.height = height;
-		canvas.style.position = "fixed";
-		canvas.style.inset = "0";
-		canvas.style.width = "100vw";
-		canvas.style.height = "100vh";
-		canvas.style.zIndex = "0";
-		canvas.style.imageRendering = "pixelated";
-		document.body.appendChild(canvas);
-
+		const canvas = document.getElementById("renderer") as HTMLCanvasElement;
 		const context = canvas.getContext("webgl2", {
     		alpha: false,
     		antialias: false,
@@ -52,7 +42,7 @@ export default {
 
 		gl.enable(gl.DEPTH_TEST);
 		gl.enable(gl.CULL_FACE);
-		gl.viewport(0, 0, width, height);
+		gl.viewport(0, 0, canvas.width, canvas.height);
 		gl.activeTexture(gl.TEXTURE0);
 
 		cameraBuffer = gl.createBuffer();

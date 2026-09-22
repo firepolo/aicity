@@ -2,6 +2,6 @@ export const enum MessageType {
 	GenerateNpc,
 	ChatNpc,
 	NpcGenerated,
-	NpcSay,
+	NpcRespond,
 	Count
 };

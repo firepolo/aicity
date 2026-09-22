@@ -1,4 +1,5 @@
 import { MessageType } from "@game/shared/network";
+import overlay from "../ui/overlay";
 
 export type MessageCallback = (data: DataView) => void;
 
@@ -24,6 +25,7 @@ async function onMessage(e: MessageEvent): Promise<void> {
 
 export default {
 	initialize: async (): Promise<void> => new Promise<void>(res => {
+		overlay.setSubTitle("Network");
 		socket = new WebSocket("ws://127.0.0.1:4000");
 		socket.addEventListener("open", () => res());
 		socket.addEventListener("close", onClose);

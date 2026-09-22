@@ -1,4 +1,3 @@
-import { ProgressCallback } from "@/core/loader";
 import network from "./network";
 import { MessageType } from "@game/shared/network";
 import { colors } from "@game/shared/colors";
@@ -11,6 +10,7 @@ import { Entity } from "@/entities/entity";
 import { LinkedList } from "./linkedlist";
 import camera from "./camera";
 import { Collidable } from "@/entities/collidable";
+import overlay from "../ui/overlay";
 
 const CellWidth = 30;
 const HalfCellWidth = CellWidth * 0.5;
@@ -101,7 +101,7 @@ function updateNpcList(index: number, elapsedTime: number): void {
 }
 
 export default {
-	load: async (callback: ProgressCallback): Promise<void> => new Promise((res) => {
+	load: async (): Promise<void> => new Promise((res) => {
 		network.once(MessageType.NpcGenerated, (data?: DataView) => {
 			const view = data!;
 			const count = view.getInt16(1);
@@ -167,9 +167,11 @@ export default {
 			res();
 		});
 
-		callback("Loading level");
+		overlay.setSubTitle("Generate level");
 
 		generate();
+
+		overlay.setSubTitle("Generate NPC");
 
 		const buffer = new ArrayBuffer(1);
 		const view = new DataView(buffer);
@@ -279,6 +281,24 @@ export default {
         	else collidable.velocity.z += dy;
 			return;
     	}
+	},
+
+	callNpc() {
+		const tx = Math.floor(camera.position.x * InvCellWidth + 0.5);
+		const ty = Math.floor(camera.position.z * InvCellWidth + 0.5);
+		const l = Math.max(1, tx - 1);
+		const r = Math.min(WidthLimit, tx + 1);
+		const t = Math.max(1, ty - 1);
+		const b = Math.min(WidthLimit, ty + 1);
+		for (let y = t; y <= b; ++y) {
+			for (let x = l; x <= r; ++x) {
+				const list = npcGrid[(y << ShiftWidth) + x];
+				if (!list) continue;
+
+				for (let node = list.begin; node; node = node.next) {
+				}
+			}
+		}
 	},
 
 	renderCells() {

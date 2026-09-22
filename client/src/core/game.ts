@@ -1,16 +1,27 @@
 import renderer from "@/core/renderer";
 import { Player } from "@/entities/player";
 import level from "./level";
+import { keys } from "./input";
 
 const player: Player = new Player();
 
 let lastTime: number;
+let inChat: boolean;
 
 function onTick(now: number): void {
 	const elapsedTime = (now - lastTime) * 0.001;
 	lastTime = now;
 
-	player.input(elapsedTime);
+	if (!inChat) {
+		player.input(elapsedTime);
+
+		if (keys["KeyE"]) {
+			if (level.callNpc()) {
+				inChat = true;
+			}
+		}
+	}
+
 
 	level.collision(player);
 	player.update();
@@ -26,6 +37,7 @@ export default {
 	initialize(): void {
 		level.initialize(player);
 
+		inChat = false;
 		lastTime = performance.now();
 	},
 

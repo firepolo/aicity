@@ -1,9 +1,9 @@
 import { gl } from "@/core/renderer";
-import { ProgressCallback } from "@/core/loader"
 import cellvs from "@/assets/shaders/cell.vs";
 import cellfs from "@/assets/shaders/cell.fs";
 import npcvs from "@/assets/shaders/npc.vs";
 import npcfs from "@/assets/shaders/npc.fs";
+import overlay from "@/ui/overlay";
 
 export class Shader {
 	readonly id: WebGLProgram;
@@ -22,7 +22,7 @@ export class Shader {
 export const shaders: Record<string, Shader> = {};
 
 export default {
-	async load(callback: ProgressCallback): Promise<void> {
+	async load(): Promise<void> {
 		const urls: Record<string, string> = {
 			cellvs,
 			cellfs,
@@ -45,7 +45,7 @@ export default {
 
 		for (const name in urls) {
 			const url = urls[name];
-			callback(url);
+			overlay.setSubTitle(url);
 			try {
 				const source = (await (await fetch(url)).text());
 				const type: GLenum = getShaderType(url.split("?")[0].slice(-2));

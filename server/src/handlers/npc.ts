@@ -5,7 +5,7 @@ import { Client } from "@/shared/data";
 import database from "@/services/database";
 
 export default {
-	generate(client: Client) {
+	generate(client: Client): void {
 		/*events.send("npc.generate", {
 			clientId: client.uuid,
 			count: 4096
@@ -38,5 +38,13 @@ export default {
 			view.setUint8(j + 5, indexes.eye[row.eye]);
 		}
 		client.socket.send(buffer);
+	},
+
+	chat(client: Client, npc: number, message: string): void {
+		events.send("npc.chat", {
+			clientId: client.uuid,
+			npc,
+			message
+		});
 	}
 }

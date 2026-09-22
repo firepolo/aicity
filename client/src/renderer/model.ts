@@ -1,6 +1,5 @@
 import { Vec2 } from "@/math/vec2";
 import { Vec3 } from "@/math/vec3";
-import { ProgressCallback } from "@/core/loader"
 
 import { gl } from "@/core/renderer"
 import building001 from "@/assets/models/building.001.obj"
@@ -14,6 +13,7 @@ import streetl from "@/assets/models/street.l.obj"
 import streett from "@/assets/models/street.t.obj"
 import streetx from "@/assets/models/street.x.obj"
 import npc from "@/assets/models/npc.obj"
+import overlay from "@/ui/overlay";
 
 export class Model {
 	readonly vba: WebGLVertexArrayObject;
@@ -41,7 +41,7 @@ export class Model {
 export const models: Record<string, Model> = {};
 
 export default {
-	async load(callback: ProgressCallback): Promise<void> {
+	async load(): Promise<void> {
 		const urls: Record<string, string> = {
 			building001,
 			building002,
@@ -58,7 +58,7 @@ export default {
 
 		for (const name in urls) {
 			const url = urls[name];
-			callback(url);
+			overlay.setSubTitle(url);
 			const source = (await (await fetch(url)).text());
 			const lines: string[] = source.split("\n");
 			const vertices: Vec3[] = [];

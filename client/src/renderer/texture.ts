@@ -1,5 +1,4 @@
 import { gl } from "@/core/renderer";
-import { ProgressCallback } from "@/core/loader"
 import building001 from "@/assets/textures/building.001.png";
 import building002 from "@/assets/textures/building.002.png";
 import building003 from "@/assets/textures/building.003.png";
@@ -11,11 +10,12 @@ import streetl from "@/assets/textures/street.l.png";
 import streett from "@/assets/textures/street.t.png";
 import streetx from "@/assets/textures/street.x.png";
 import npc from "@/assets/textures/npc.png";
+import overlay from "@/ui/overlay";
 
 export const textures: Record<string, WebGLTexture> = {};
 
 export default {
-	async load(callback: ProgressCallback): Promise<void> {
+	async load(): Promise<void> {
 		const urls: Record<string, string> = {
 			building001,
 			building002,
@@ -34,7 +34,7 @@ export default {
 			await new Promise<void>((res) => {
 				const image = new Image();
 				const url = urls[name];
-				callback(url);
+				overlay.setSubTitle(url);
 				image.onload = () => {
 					const texture = gl.createTexture();
 					gl.bindTexture(gl.TEXTURE_2D, texture);

@@ -1,5 +1,6 @@
 import { Vec2 } from "@/math/vec2";
 import { gl } from "./renderer";
+import overlay from "../ui/overlay";
 
 export let mouseLocked = false;
 export const mouse: Vec2 = new Vec2(0, 0);
@@ -27,6 +28,8 @@ function onKeyEvent(e: KeyboardEvent): void {
 
 export default {
 	initialize(): void {
+		overlay.setSubTitle("Input");
+
 		gl.canvas.addEventListener("click", onCanvasClick);
 		document.addEventListener("pointerlockchange", onPointerLockChange);
 

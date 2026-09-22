@@ -22,6 +22,9 @@ async function onMessage(receivedMessage: ServiceBusReceivedMessage): Promise<vo
 		case MessageType.NpcGenerated:
 			npc.generated(client);
 			break;
+		case MessageType.NpcRespond:
+			//npc.respond(client);
+			break;
 	}
 }
 

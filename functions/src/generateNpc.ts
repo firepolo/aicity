@@ -27,9 +27,9 @@ const sender = bus.createSender(process.env.SERVICE_BUS_TOPIC!, {
 });
 
 export async function generateNpc(message: EventMessage, context: InvocationContext): Promise<void> {
-	const client = await pool.connect();
-
     context.log("GENERATENPC process message");
+
+	const client = await pool.connect();
 
 	try {
 		await client.query("BEGIN");
@@ -81,7 +81,7 @@ export async function generateNpc(message: EventMessage, context: InvocationCont
 		}
 	});
 
-    context.log("GENERATENPC topic function processed message:", message);
+    context.log("GENERATENPC processed message:", message);
 }
 
 app.serviceBusTopic("generateNpc", {
