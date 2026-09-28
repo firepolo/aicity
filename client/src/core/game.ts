@@ -1,27 +1,25 @@
 import renderer from "@/core/renderer";
-import { Player } from "@/entities/player";
 import level from "./level";
 import { keys } from "./input";
+import { Player } from "@/entities/player";
+import chatbox from "@/ui/chatbox";
 
 const player: Player = new Player();
 
 let lastTime: number;
-let inChat: boolean;
 
 function onTick(now: number): void {
 	const elapsedTime = (now - lastTime) * 0.001;
 	lastTime = now;
 
-	if (!inChat) {
+	if (!chatbox.visible) {
 		player.input(elapsedTime);
 
 		if (keys["KeyE"]) {
-			if (level.callNpc()) {
-				inChat = true;
-			}
+			const npc = level.callNpc();
+			if (npc) chatbox.show(npc);
 		}
 	}
-
 
 	level.collision(player);
 	player.update();
@@ -37,7 +35,6 @@ export default {
 	initialize(): void {
 		level.initialize(player);
 
-		inChat = false;
 		lastTime = performance.now();
 	},
 

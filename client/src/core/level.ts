@@ -77,6 +77,7 @@ function updateNpcList(index: number, elapsedTime: number): void {
 
 	for (let node = list.begin; node; node = node.next) {
 		const npc = node.value;
+		if (npc.inChat) continue;
 		if (npc.time >= 0.9999) {
 			const nextIndexes = nexts[index];
 			const next = nextIndexes.length > 1 || npc.prevIndex < 0 ? nextIndexes.filter(n => n != npc.prevIndex)[Math.floor(Math.random() * (nextIndexes.length - 1))] : npc.prevIndex;
@@ -182,14 +183,15 @@ export default {
 
 	initialize(entity: Entity): void {
 		const streets = map.reduce((a: number[], m: number, i: number) => m > 0 ? [...a, i] : a, []);
+		const maxIndex = streets.length - 1;
 
-		let index = streets[Math.floor(Math.random() * 0.9999 * streets.length)];
+		let index = streets[Math.floor(Math.random() * maxIndex)];
 		entity.position.setXYZ((index & WidthLimit) * CellWidth, 0.0, (index >> ShiftWidth) * CellWidth);
 
 		for (let i = 0; i < nexts.length; ++i) nexts[i] = [ i - Width, i - 1, i + 1, i + Width ].filter(n => map[n] > 0);
 
 		for (const npc of npcs) {
-			index = streets[Math.floor(Math.random() * (streets.length - 1))];
+			index = streets[Math.floor(Math.random() * maxIndex)];
 			npc.waypoint.set((index & WidthLimit) * CellWidth + (Math.random() - Math.random()) * StreetWidth, (index >> ShiftWidth) * CellWidth + (Math.random() - Math.random()) * StreetWidth);
 			npc.time = 1.0;
 			npcGrid[index].push(npc);
@@ -283,22 +285,33 @@ export default {
     	}
 	},
 
-	callNpc() {
+	callNpc(): Npc | null {
+		const cos = Math.cos(camera.yaw);
+		const sin = Math.sin(camera.yaw);
 		const tx = Math.floor(camera.position.x * InvCellWidth + 0.5);
-		const ty = Math.floor(camera.position.z * InvCellWidth + 0.5);
-		const l = Math.max(1, tx - 1);
-		const r = Math.min(WidthLimit, tx + 1);
-		const t = Math.max(1, ty - 1);
-		const b = Math.min(WidthLimit, ty + 1);
-		for (let y = t; y <= b; ++y) {
-			for (let x = l; x <= r; ++x) {
-				const list = npcGrid[(y << ShiftWidth) + x];
-				if (!list) continue;
+		const ty = Math.floor(camera.position.z * InvCellWidth + 0.5) << ShiftWidth;
+		let npc: Npc | null = null;
+		let minDist = Number.MAX_SAFE_INTEGER;
 
-				for (let node = list.begin; node; node = node.next) {
-				}
+		for (const i of [(Math.max(1, ty - 1) << ShiftWidth) + tx, ty + Math.max(1, tx - 1), ty + tx, ty + Math.min(WidthLimit, tx + 1), (Math.min(WidthLimit, ty + 1) << ShiftWidth) + tx]) {
+			const list = npcGrid[i];
+			if (!list) continue;
+
+			for (let node = list.begin; node; node = node.next) {
+				const rx = node.value.position.x - camera.position.x;
+				const rz = node.value.position.z - camera.position.z;
+				const sl = rx * rx + rz * rz;
+				if (sl >= 24 || sl >= minDist) continue;
+
+				const l = Math.sqrt(sl);
+				if (sin * rx / l - cos * rz / l < 0.7) continue;
+
+				minDist = sl;
+				npc = node.value;
 			}
 		}
+
+		return npc;
 	},
 
 	renderCells() {

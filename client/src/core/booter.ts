@@ -10,10 +10,9 @@ import chatbox from "@/ui/chatbox";
 
 export default {
 	async boot(): Promise<void> {
-		chatbox.hide();
-
 		try {
 			overlay.setTitle("Initializing...");
+			chatbox.initialize();
 			renderer.initialize();
 			input.initialize();
 			await network.initialize();

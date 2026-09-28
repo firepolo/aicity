@@ -1,12 +1,14 @@
 import { Vec2 } from "@/math/vec2";
 import { gl } from "./renderer";
 import overlay from "../ui/overlay";
+import chatbox from "@/ui/chatbox";
 
 export let mouseLocked = false;
 export const mouse: Vec2 = new Vec2(0, 0);
 export const keys: Record<string, boolean> = {};
 
 function onCanvasClick(): void {
+	if (chatbox.visible) return;
 	gl.canvas.requestPointerLock({
 		unadjustedMovement: true
 	});
@@ -37,5 +39,16 @@ export default {
 
 		window.addEventListener("keydown", onKeyEvent);
 		window.addEventListener("keyup", onKeyEvent);
+	},
+
+	lockMouse: onCanvasClick,
+
+	unLockMouse(): void {
+		if (mouseLocked) document.exitPointerLock();
+	},
+
+	clear(): void {
+		for (const code in keys) keys[code] = false;
+		mouse.set(0, 0);
 	}
 }

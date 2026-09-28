@@ -17,6 +17,15 @@
 				font-size: 24px;
 			}
 
+			#cursor {
+				position: fixed;
+				top: 50%;
+				left: 50%;
+				width: 8px;
+				height: 8px;
+				transform: translate(-50%, -50%);
+			}
+
 			#renderer {
 				position: fixed;
 				inset: 0;
@@ -63,6 +72,15 @@
 				font-size: inherit;
 			}
 
+			#chatbox-exit {
+				padding: .5rem;
+				background-color: #333;
+				border: none;
+				color: #eee;
+				font-family: inherit;
+				font-size: inherit;
+			}
+
 			h1, h3 {
 				margin: 0;
 				text-align: center;
@@ -76,8 +94,12 @@
     </head>
     <body>
 		<canvas id="renderer" width="320" height="180"></canvas>
+		<svg id="cursor" viewBox="0, 0, 10, 10" xmlns="http://www.w3.org/2000/svg">
+			<circle cx="5" cy="5" r="5" fill="#eee" />
+		</svg>
 		<div id="chatbox">
 			<textarea id="chatbox-input" rows="4"></textarea>
+			<button id="chatbox-exit" type="button">Leave</button>
 		</div>
 		<div id="overlay">
 			<div id="overlay-wrapper">

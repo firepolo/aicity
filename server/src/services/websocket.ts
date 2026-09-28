@@ -30,8 +30,8 @@ function onConnection(socket: WebSocket): void {
 				npc.generate(client);
 				break;
 			case MessageType.ChatNpc:
-				const id = buffer.readUint32LE(1);
-				const message = data.toString("utf8", 5)
+				const id = buffer.readUInt32LE(1);
+				const message = data.toString("utf8", 5);
 				npc.chat(client, id, message);
 				break;
 		}

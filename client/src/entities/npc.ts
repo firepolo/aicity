@@ -4,9 +4,9 @@ import { shaders } from "@/renderer/shader";
 import { Vec2 } from "@/math/vec2";
 
 export class Npc extends Entity {
-	private readonly id: number;
-	private readonly hair: number;
-	private readonly eye: number;
+	readonly id: number;
+	readonly hair: number;
+	readonly eye: number;
 	readonly speed: number;
 	readonly look: Vec2 = new Vec2(0.0, 1.0);
 	readonly waypoint: Vec2 = new Vec2(0.0, 0.0);
@@ -15,6 +15,7 @@ export class Npc extends Entity {
 	prevIndex : number = -1;
 	distance: number = 0.0;
 	time: number = 0.0;
+	inChat: boolean = false;
 
 	constructor(id: number, hair: number, eye: number, texture: WebGLTexture) {
 		super();
