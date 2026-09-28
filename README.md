@@ -60,6 +60,10 @@ npm run dev
 ```
 
 ## Deploy Function App
+Build functions
+```shell
+npm run build:functions
+```
 Goto in folder ```functions```
 ```shell
 cd ./functions
