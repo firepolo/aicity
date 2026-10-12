@@ -2,7 +2,7 @@
 	"name": "@game/functions",
 	"type": "module",
 	"private": true,
-	"main": "dist/build/generateNpc.js",
+	"main": "dist/build/*.js",
 	"scripts": {
 		"dev": "func start",
 		"types": "tsc --noEmit",
