@@ -112,3 +112,6 @@ Ta réponse doit être au format texte brute.
 - Event Grid
 - Functions
 - OpenTelemetry
+
+## Todo
+- Add OpenTelemetry in functions & container
